@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+/* Filament sidebar styles */
+.fi-sidebar {
+    background-color: white !important;
+    margin-right: -1rem !important;
+    width: 17rem !important;
+}
+
+/* Sidebar ochiq holatdagi kengligi */
+.fi-sidebar-open {
+    width: 17rem !important;
+}
+
+/* Sidebar yopiq holatdagi kengligi */
+.fi-sidebar-collapsed {
+    width: 5rem !important;
+}
+
+.fi-sidebar .fi-sidebar-header {
+    background-color: white !important;
+    border-color: rgb(229 231 235) !important;
+}
+
+/* Sidebar elementlari uchun yangi stillar */
+.fi-sidebar-item {
+    @apply text-lg font-semibold !important;
+}
+
+/* Guruh sarlavhalari uchun yangi stillar */
+.fi-sidebar-group-button {
+    @apply text-lg font-semibold !important;
+}
+
+/* Guruh elementlari uchun yangi stillar */
+.fi-sidebar-group .fi-sidebar-item {
+    @apply text-lg font-semibold !important;
+}
+
+.fi-sidebar .fi-sidebar-item {
+    color: rgb(107 114 128) !important;
+    font-size: 1.125rem !important;
+}
+
+/* Active va hover holatlar uchun */
+.fi-sidebar .fi-sidebar-item[aria-current="page"],
+.fi-sidebar .fi-sidebar-item.active {
+    background-color: rgb(243 244 246) !important; /* gray-100 */
+    color: rgb(55 65 81) !important;
+}
+
+.fi-sidebar .fi-sidebar-item:hover {
+    background-color: rgb(243 244 246) !important;
+    color: rgb(55 65 81) !important;
+}
+
+.fi-sidebar .fi-sidebar-group-button {
+    color: rgb(107 114 128) !important;
+    font-size: 1.125rem !important;
+}
+
+/* Guruh button active holati */
+.fi-sidebar .fi-sidebar-group-button[aria-expanded="true"] {
+    background-color: rgb(243 244 246) !important; /* gray-100 */
+    color: rgb(55 65 81) !important;
+}
+
+.fi-sidebar .fi-sidebar-group-button:hover {
+    background-color: rgb(243 244 246) !important;
+    color: rgb(55 65 81) !important;
+}
+
+.fi-sidebar .fi-icon-btn {
+    color: rgb(107 114 128) !important;
+}
+
+.fi-sidebar .fi-icon-btn:hover {
+    background-color: rgb(243 244 246) !important;
+    color: rgb(55 65 81) !important;
+}
+
+/* Sidebar border */
+.fi-sidebar .ring-gray-950\/5 {
+    --tw-ring-color: rgb(229 231 235) !important;
+}
+
+/* Sarlavha rangi*/
+.fi-header-heading {
+    color: rgb(88, 89, 91) !important;
+    margin-bottom: -1.3rem !important;
+}
+
+/* Sidebar guruhlar orasidagi masofani kamaytirish */
+.fi-sidebar-nav-groups {
+    gap: 0.1rem !important;
+}
+
+/* Yoki alohida har bir guruh uchun */
+.fi-sidebar-group {
+    margin-bottom: 0.1rem !important;
+}
+
+/* Guruh sarlavhasi uchun qo'shimcha stil */
+.fi-sidebar-group-button span {
+    @apply text-lg font-semibold !important;
+    font-size: 1.125rem !important;
+}
