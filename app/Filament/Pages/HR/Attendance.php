@@ -9,7 +9,7 @@ class Attendance extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-clock';
     protected static ?string $navigationGroup = 'Kadrlar Bo\'limi';
-    protected static ?string $navigationLabel = 'Davomat';
+    protected static ?string $navigationLabel = 'Xodimlar davomati';
     protected static ?string $title = 'Xodimlar davomati';
     protected static ?string $slug = 'hr/attendance';
     protected static ?int $navigationSort = 19;
