@@ -13,11 +13,17 @@ return new class extends Migration
     {
         Schema::create('parents', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Ota-ona ismi
-            $table->string('phone')->nullable(); // Telefon raqami
-            $table->string('email')->nullable(); // Email
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete(); // Talaba bilan bog'lanish
+            $table->foreignId('student_id')
+                ->constrained()
+                ->onDelete('cascade');
+            $table->string('full_name');
+            $table->string('phone');
+            $table->string('email')->nullable();
             $table->timestamps();
+
+            // Indekslar
+            $table->index('phone');
+            $table->index('email');
         });
     }
 

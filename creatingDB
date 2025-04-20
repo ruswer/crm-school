@@ -1,0 +1,122 @@
+O'quvchilar uchun database strukturasi quyidagicha bo'lishi kerak:
+
+Students (O'quvchilar) jadvali
+- id (primary key)
+- passport_number (Metrika/Pasport raqami)
+- branch_id (Filial - foreign key)
+- group_id (Guruh - foreign key)
+- first_name (Ism)
+- last_name (Familiya)
+- gender (Jinsi - enum: male/female)
+- birth_date (Tug'ilgan yili)
+- phone (Telefon raqami)
+- email (Email)
+- status (enum: contact, trial, after_trial, client, online)
+- study_language (enum: uzbek, russian, english)
+- knowledge_level (enum: beginner, intermediate, advanced, other)
+- study_days (set: monday, tuesday, wednesday, thursday, friday, saturday)
+- marketing_source_id (foreign key - qayerdan bildi)
+- notes (Izoh - text)
+- trial_teacher_id (Sinov darsi o'qituvchisi - foreign key)
+- trial_called_at (Sinov darsiga chaqirilgan vaqt)
+- trial_attended_at (Sinov darsiga kelgan vaqt)
+- created_at
+- updated_at
+
+Copy
+
+Insert
+
+Student_Courses (O'quvchi kurslari) jadvali
+- student_id (foreign key)
+- course_id (foreign key)
+- created_at
+
+Copy
+
+Insert
+
+Parents (Ota-onalar) jadvali
+- id (primary key)
+- student_id (foreign key)
+- full_name (Ota/ona ismi)
+- phone (Telefon)
+- email (Email)
+- created_at
+- updated_at
+
+Copy
+
+Insert
+
+Courses (Kurslar) jadvali
+- id (primary key)
+- name (Kurs nomi)
+- description
+- status
+
+Copy
+
+Insert
+
+Branches (Filiallar) jadvali
+- id (primary key)
+- name (Filial nomi)
+- address
+- status
+
+Copy
+
+Insert
+
+Groups (Guruhlar) jadvali
+- id (primary key)
+- name (Guruh nomi)
+- status
+
+Copy
+
+Insert
+
+Marketing_Sources (Marketing manbalari) jadvali
+- id (primary key)
+- name (Manba nomi)
+- type
+- status
+
+Copy
+
+Insert
+
+Staff (O'qituvchilar) jadvali
+- id (primary key)
+- first_name
+- last_name
+- position
+- status
+
+Copy
+
+Insert
+
+Muhim bog'lanishlar:
+
+Students -> Branches (Many-to-One)
+Students -> Groups (Many-to-One)
+Students -> Staff (Many-to-One, trial teacher)
+Students -> Courses (Many-to-Many through Student_Courses)
+Students -> Parents (One-to-Many)
+Students -> Marketing_Sources (Many-to-One)
+Qo'shimcha indekslar:
+
+passport_number (unique)
+phone (index)
+email (index)
+status (index)
+Enum va Set qiymatlar:
+
+Status: contact, trial, after_trial, client, online
+Gender: male, female
+Study_language: uzbek, russian, english
+Knowledge_level: beginner, intermediate, advanced, other
+Study_days: monday, tuesday, wednesday, thursday, friday, saturday

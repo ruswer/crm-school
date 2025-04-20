@@ -5,17 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Course extends Model
+class Group extends Model
 {
     protected $fillable = [
         'name',
-        'description',
         'status'
     ];
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'student_courses')
-            ->withTimestamps();
+        return $this->belongsToMany(Student::class, 'students_groups')
+            ->withTimestamps();    
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ParentModel extends Model
+class StudyDayStudent extends Model
 {
-    use HasFactory;
-
-    protected $table = 'parents'; // Jadval nomi
-
-    protected $fillable = ['name', 'phone', 'email', 'student_id'];
+    protected $fillable = [
+        'student_id',
+        'day'
+    ];
 
     public function student()
     {

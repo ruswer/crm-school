@@ -1,66 +1,290 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+crm Struktura
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Bulimlar
+    -uquvchilar
+        (sahifalar)
+        -o'quvchilar
+            (funksionalliklar)
+            -qidirish qismida excel fayldan import qilish,qidirish
+            -pastki qismda uquvchilar ruyhatini jadval sifatida kursatish
+        -o'quvchini qo'shish
+            (funksionalliklar)
+            -uquvchi malumotlarini yaratish yani create,Qo'shish & Yana Qo'shish
+        -ota-ona
+            (funksionalliklar)
+            -qidirish
+            -pastki qismda ota-ona ruyhatini jadval sifatida kursatish
+        -avtorizatsiya malumotlari
+            (funksionalliklar)
+            -qidirish
+            -pastki qismda uquvchi va ota-ona Saytga kirish ma'lumotlari kursatish
+        -bitiruvchilar
+            (funksionalliklar)
+            -qidirish
+            -pastki qismda Bitiruvchilar ruyhatini jadval sifatida kursatish
+    -Tulovlar
+        (sahifalar)
+        -tulov
+            (funksionalliklar)
+            -qidirish,
+            -pastki qismda tulov ruyhati natijasi jadval sifatida kursatish
+        -qarzdorlar
+            (funksionalliklar)
+            -qidirish,
+            -pastki qismda qarzdorlar ruyhatini jadval sifatida kursatish
+    -chiqimilar
+        (sahifalar)
+        -chiqim qoshish
+            (funksionalliklar)
+            -chiqim qoshish
+            -ong tomonda chiqimlar ruyhatini jadval sifatida kursatish
+        -chiqimilarni izlash
+            (funksionalliklar)
+            -qidirish,
+            -pastki qismda chiqimlar natijasini jadval sifatida kursatish
+        -chiqim kategoriyalari
+            (funksionalliklar)
+            -chiqim kategoriya qoshish
+            -ong tomonda kategoriyalar ruyhatini jadval sifatida kursatish
+    -marketing
+        (sahifalar)
+        -marketing hisoboti
+            (funksionalliklar)
+            -qidirish,
+            -pastki qismda reklama buyicha hisobot,Jins bo'yicha taqsimot natijasini alohida jadval sifatida kursatish
+        -reklama turlari
+            (funksionalliklar)
+            -reklama turi qoshish
+            -ong tomonda reklama turi ruyhatini jadval sifatida kursatish
+    -imtihonlar
+        (sahifalar)
+        -imtihonlar royhati
+            (funksionalliklar)
+            -qidirish
+            -pastki tomonda ong tomonda qoshish, imtihonlar ruyhatini jadval sifatida kursatish
+    -talim
+        (sahifalar)
+        -guruhlar
+            (funksionalliklar)
+            -guruh qoshish
+            -ong tomonda guruh ruyhatini jadval sifatida kursatish,tepa qismida faol,kutilmoqda,ochirilgan buyicha sortlash
+        -filiallar
+            (funksionalliklar)
+            -filial qoshish
+            -ong tomonda filiallar ruyhatini jadval sifatida kursatish
+        -kurslar
+            (funksionalliklar)
+            -kurs qoshish
+            -ong tomonda kurslar ruyhatini jadval sifatida kursatish
+        -bilim darajasi
+            (funksionalliklar)
+            -bilim darajasi qoshish
+            -ong tomonda bilim darajalari ruyhatini jadval sifatida kursatish
+        -kabinetlar
+            (funksionalliklar)
+            -kabinet qoshish
+            -ong tomonda kabunetlar ruyhatini jadval sifatida kursatish
+        -darslar jadvali
+            (funksionalliklar)
+            -qidirish,qoshish tugmasi orqali create
+            -pastki qismda darslar jadvalini kalendar ichida kursatish kerak
+    -kadrlar bulimi
+        (sahifalar)
+        -xodimlar
+            (funksionalliklar)
+            -qidirish,qoshish tugmasi orqali create
+            -pastki qismda xodimlarni ruyhatini grid va royhat sifatida kursatish
+        -xodimlar davomati
+            (funksionalliklar)
+            -qidirish
+            -pastki qismda saqlash tugmasi, xodimlar davomatini jadval ichida qiymatlarini kiritib saqlash tugmasi orqali DB ga saqlash kerak
+        -xodimlar davomat hisoboti
+            (funksionalliklar)
+            -qidirish,
+            -pastki qismda xodimlar davomati hisoboti jadval ichida kursatish kerak
+        -ish xaqi
+            (funksionalliklar)
+            -qidirish
+            -pastki qismda jadval ichida xodimlar ruyhati va qiymatlarini kiritib saqlash tugmasi orqali DB ga saqlash kerak
+        -bolim
+            (funksionalliklar)
+            -bolim qoshish
+            -ong tomonda bolimlar ruyhati jadval ichida kursatish kerak
+        -lavozim
+            (funksionalliklar)
+            -lavozim qoshish
+            -ong tomonda lavozimlar ruyhati jadval ichida kursatish kerak
+    -tizimni sozlash
+        (sahifalar)
+        sozlamalar
+            (funksionalliklar)
+            -logo qoshish
+            -ong tomonda bolimlar ruyhati jadval ichida kursatish kerak,tahrirlash orqali update
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+                            1-Database strukturasi:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Users (Foydalanuvchilar)
+   - id, name, email, password, role, status
 
-## Learning Laravel
+2. Students (O'quvchilar)
+   - id, first_name, last_name, phone, address, gender, birth_date, status
+   - photo, registration_date, marketing_source_id
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Parents (Ota-onalar)
+   - id, student_id, name, phone, additional_phone, relation_type
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4. Groups (Guruhlar)
+   - id, name, course_id, teacher_id, room_id, status
+   - start_date, end_date, lesson_days, lesson_time
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5. Courses (Kurslar)
+   - id, name, description, price, duration
+   - level_id, status
 
-## Laravel Sponsors
+6. Payments (To'lovlar)
+   - id, student_id, group_id, amount, payment_date
+   - payment_type, status, description
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+7. Expenses (Chiqimlar)
+   - id, category_id, amount, date, description
+   - added_by, status
 
-### Premium Partners
+8. ExpenseCategories (Chiqim kategoriyalari)
+   - id, name, description
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+9. Staff (Xodimlar)
+   - id, first_name, last_name, position_id
+   - department_id, salary, hire_date, status
 
-## Contributing
+10. Attendance (Davomat)
+    - id, student_id/staff_id, date, status
+    - type (student/staff), description
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+11. Branches (Filiallar)
+    - id, name, address, phone, manager_id
 
-## Code of Conduct
+12. Rooms (Xonalar)
+    - id, branch_id, name, capacity, status
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+13. Exams (Imtihonlar)
+    - id, name, course_id, date, description
 
-## Security Vulnerabilities
+14. ExamResults
+    - id, exam_id, student_id, score, notes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+15. MarketingSources (Marketing manbalari)
+    - id, name, type, status
 
-## License
+                            2-Asosiy modullar:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Authentication va Authorization
+   - Login/Logout
+   - Role-based access control
+   - Permission management
+
+2. O'quvchilar moduli
+   - CRUD operatsiyalari
+   - Excel import/export
+   - Ota-ona ma'lumotlari
+   - To'lov tarixi
+   - Davomat
+
+3. To'lovlar moduli
+   - To'lov qabul qilish
+   - Qarzdorlar ro'yxati
+   - To'lov tarixi
+   - Hisobotlar
+
+4. Moliya moduli
+   - Chiqimlarni boshqarish
+   - Kategoriyalar
+   - Moliyaviy hisobotlar
+
+5. Ta'lim moduli
+   - Guruhlarni boshqarish
+   - Dars jadvali
+   - Kurslar
+   - Xonalar
+   - Imtihonlar
+
+6. Kadrlar moduli
+   - Xodimlar
+   - Davomat
+   - Ish haqi
+   - Bo'limlar
+
+7. Marketing moduli
+   - Marketing hisobotlari
+   - Reklama turlari
+   - Konversiya tahlili
+
+8. Hisobotlar moduli
+   - Moliyaviy hisobotlar
+   - Davomat hisobotlari
+   - Marketing hisobotlari
+
+                        3-Interfeys strukturasi:
+
+1. Dashboard
+   - Asosiy statistika
+   - Tezkor ma'lumotlar
+   - Grafik va diagrammalar
+
+2. Asosiy menyu
+   - O'quvchilar
+   - To'lovlar
+   - Chiqimlar
+   - Marketing
+   - Ta'lim
+   - Kadrlar
+   - Sozlamalar
+
+3. Qidiruv va filtrlash
+   - Har bir bo'limda advanced qidiruv
+   - Filtrlar
+   - Export funksiyalari
+
+                        4-Xavfsizlik:
+
+1. Rollar:
+   - Super Admin
+   - Admin (Filial rahbari)
+   - O'qituvchi
+   - Hisobchi
+   - Marketing manager
+   - Operator
+
+2. Ruxsatlar:
+   - Create
+   - Read
+   - Update
+   - Delete
+   - Export
+   - Import
+
+                        5-Integratsiyalar:
+
+1. SMS xizmati
+2. Email xizmati
+3. Excel import/export
+4. Kalendar
+5. Hisobot generatori
+
+                        6-Qo'shimcha funksionallar:
+
+1. Avtomatik eslatmalar
+   - To'lov muddati
+   - Dars jadvali
+   - Tug'ilgan kun
+
+2. Statistika va tahlil
+   - O'quvchilar soni dinamikasi
+   - Moliyaviy ko'rsatkichlar
+   - Marketing samaradorligi
+
+3. Monitoring
+   - Davomat nazorati
+   - To'lovlar nazorati
+   - Xodimlar faoliyati

@@ -1,0 +1,88 @@
+CRM loyihasini Users (Foydalanuvchilar) modelidan boshlash eng to'g'ri. Chunki:
+
+Avval Authentication va Authorization tizimini o'rnatishimiz kerak:
+1. Users (Foydalanuvchilar) jadvali
+   - id
+   - name (FIO)
+   - email (Login uchun)
+   - password (Parol)
+   - role (Roli - super_admin, admin, teacher, student)
+   - status (Holati - active, inactive)
+   - phone (Telefon)
+   - last_login (Oxirgi kirish vaqti)
+   - created_at
+   - updated_at
+
+
+Rollar va Ruxsatlar:
+Rollar:
+- Super Admin (Tizim egasi)
+- Admin (Filial rahbari)
+- O'qituvchi
+- O'quvchi
+
+Har bir rol uchun ruxsatlar:
+- Super Admin: Barcha imkoniyatlar
+- Admin: O'z filialiga oid barcha ma'lumotlar
+- O'qituvchi: O'z guruhlari va o'quvchilari
+- O'quvchi: O'z ma'lumotlari
+
+
+Keyingi bosqichlar:
+1. Authentication tizimini o'rnatish
+   - Login/Register
+   - Password Reset
+   - Email verification
+
+2. Filiallar modulini yaratish
+   - Filiallar CRUD
+   - Filial sozlamalari
+
+3. O'qituvchilar modulini yaratish
+   - O'qituvchilar CRUD
+   - Guruhlar bilan bog'lash
+
+4. O'quvchilar modulini yaratish
+   - O'quvchilar CRUD
+   - Guruhlar va to'lovlar
+
+
+Filament Admin Panel:
+1. Filament o'rnatish
+2. User Resource yaratish
+3. Role va Permission larni sozlash
+4. Navigation va Layout
+
+
+Boshlash uchun qadamlar:
+
+Laravel o'rnatish:
+composer create-project laravel/laravel crm
+cd crm
+
+
+Filament o'rnatish:
+composer require filament/filament
+php artisan filament:install
+
+
+User modelini yangilash:
+php artisan make:model User -m
+
+
+Migration yaratish:
+php artisan make:migration create_users_table
+
+
+Resource yaratish:
+php artisan make:filament-resource User
+
+
+Bu bosqichlardan so'ng:
+
+Authentication tizimi
+Role va Permission
+Filiallar
+O'qituvchilar
+O'quvchilar
+tartibida davom ettiramiz. Qaysi bosqichdan boshlashni xohlaysiz?

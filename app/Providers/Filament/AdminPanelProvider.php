@@ -50,6 +50,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Parents::class,
                 \App\Filament\Pages\AuthorizationInfo::class,
                 \App\Filament\Pages\DeletedStudents::class,
+                \App\Filament\Pages\Students\StudentProfilePage::class,
                 
                 // To'lovlar bo'limi
                 \App\Filament\Pages\PaymentPage::class,
