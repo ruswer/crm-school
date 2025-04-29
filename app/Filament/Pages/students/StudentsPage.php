@@ -6,14 +6,19 @@ use App\Filament\Pages\Students\StudentProfilePage;
 use App\Models\Branch;
 use App\Models\Group;
 use App\Models\Student;
+use App\Models\RemovalReason; // Added
+use App\Models\StudentStatus;
 use Filament\Pages\Page;
+use Filament\Notifications\Notification; // Added
+use Illuminate\Validation\ValidationException; // Added
 use Livewire\WithPagination;
+use Illuminate\Database\Eloquent\Builder; // Added
+use Illuminate\Support\Facades\DB;
 
 class StudentsPage extends Page
 {
     use WithPagination;
 
-    // Navigation sozlamalari
     protected static ?string $navigationGroup = 'O\'quvchilar';
     protected static ?string $navigationLabel = 'O\'quvchilar';
     protected static ?string $title = 'O\'quvchilar';
@@ -21,26 +26,50 @@ class StudentsPage extends Page
     protected static ?int $navigationSort = 1;
     protected static string $view = 'filament.pages.students.students-page';
 
-    // Qidiruv va filtrlash uchun o'zgaruvchilar
+    // Search and filter properties
     public $search = '';
     public $selectedBranch = '';
     public $selectedGroup = '';
     public $isFilterActive = false;
     public $isSearchActive = false;
 
-    // Select uchun ma'lumotlar
+    // Data for selects
     public $branches;
     public $groups;
+
+    // Sorting properties
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
+
+    // --- Student Removal Properties ---
+    public bool $showRemoveStudentModal = false;
+    public ?int $studentToRemoveId = null;
+    public ?string $studentToRemoveName = null;
+    public ?int $removalReasonId = null;
+    public array $removalReasonsOptions = [];
+    // --- End Student Removal Properties ---
 
     public function mount()
     {
         $this->loadSelectData();
+        $this->loadRemovalReasonsOptions(); // Load removal reasons
     }
+
     private function loadSelectData()
     {
         $this->branches = Branch::where('status', 'active')->get();
         $this->groups = Group::where('status', 'active')->get();
     }
+
+    // Load removal reason options
+    protected function loadRemovalReasonsOptions(): void
+    {
+        $this->removalReasonsOptions = RemovalReason::where('is_active', true)
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id')
+                                        ->all();
+    }
+
     public function searchByFilters()
     {
         $this->isFilterActive = true;
@@ -48,6 +77,7 @@ class StudentsPage extends Page
         $this->search = '';
         $this->resetPage();
     }
+
     public function searchByKeyword()
     {
         $this->isSearchActive = true;
@@ -56,9 +86,7 @@ class StudentsPage extends Page
         $this->selectedGroup = '';
         $this->resetPage();
     }
-    // Tartiblash uchun o'zgaruvchilar
-    public $sortField = 'created_at';
-    public $sortDirection = 'desc';
+
     public function sort($column)
     {
         if ($this->sortField === $column) {
@@ -67,122 +95,91 @@ class StudentsPage extends Page
             $this->sortField = $column;
             $this->sortDirection = 'asc';
         }
+        $this->resetPage(); // Reset page when sorting changes
     }
+
     public function getStudentsProperty()
     {
         return $this->getFilteredStudentsQuery()->paginate(10);
     }
-    private function getFilteredStudentsQuery()
+
+    private function getFilteredStudentsQuery(): Builder
     {
         $query = Student::query()->with([
-            'branch',
-            'groups',
-            'status',
-            'courses',
-            'studyLanguages',
-            'knowledgeLevel',
-            'studyDays'
+            'branch:id,name', // Optimize eager loading
+            'groups:id,name',
+            'status:id,name',
+            'courses:id,name',
+            'studyLanguagesStudents', // Load related data if needed in blade
+            'knowledgeLevel:id,name',
+            'studyDayStudents' // Load related data if needed in blade
         ]);
 
         $this->applyFilters($query);
         $this->applySearch($query);
-        $this->applySort($query); // Tartiblash qo'shildi
+        $this->applySort($query);
 
         return $query;
     }
-    private function applySort($query)
+
+    private function applySort(Builder $query)
     {
+        // Simplified sorting logic, add JOINs only when necessary
         switch ($this->sortField) {
             case 'name':
                 $query->orderBy('first_name', $this->sortDirection)
-                    ->orderBy('last_name', $this->sortDirection);
+                      ->orderBy('last_name', $this->sortDirection);
                 break;
             case 'branch':
-                $query->join('branches', 'students.branch_id', '=', 'branches.id')
-                    ->orderBy('branches.name', $this->sortDirection)
-                    ->select('students.*');
+                $query->orderBy(Branch::select('name')->whereColumn('branches.id', 'students.branch_id'), $this->sortDirection);
                 break;
             case 'status':
-                $query->join('student_statuses', 'students.status_id', '=', 'student_statuses.id')
-                    ->orderBy('student_statuses.name', $this->sortDirection)
-                    ->select('students.*');
-                break;
-            case 'course':
-                // Kurs bo'yicha tartiblash
-                $query->leftJoin('student_courses', 'students.id', '=', 'student_courses.student_id')
-                    ->leftJoin('courses', 'student_courses.course_id', '=', 'courses.id')
-                    ->select('students.*')
-                    ->groupBy('students.id', 'courses.name')
-                    ->orderBy(
-                        \DB::raw('MIN(courses.name)'),
-                        $this->sortDirection
-                    );
+                 // Assuming StudentStatus model exists
+                 $query->orderBy(StudentStatus::select('name')->whereColumn('student_statuses.id', 'students.status_id'), $this->sortDirection);
                 break;
             case 'group':
-            $query->leftJoin('student_groups', 'students.id', '=', 'student_groups.student_id')
-                ->leftJoin('groups', 'student_groups.group_id', '=', 'groups.id')
-                ->select('students.*')
-                ->groupBy('students.id')
-                ->orderBy(
-                    \DB::raw('MIN(groups.name)'),
-                    $this->sortDirection
-                );
-            break;
+                 $query->orderBy(
+                     Group::select('name')
+                         ->join('student_groups', 'groups.id', '=', 'student_groups.group_id')
+                         ->whereColumn('student_groups.student_id', 'students.id')
+                         ->orderBy('name', 'asc') // Order within subquery if multiple groups
+                         ->limit(1),
+                     $this->sortDirection
+                 );
+                 break;
             case 'phone':
-                $query->orderBy('phone', $this->sortDirection);
-                break;
-            case 'language':
-                // Til bo'yicha tartiblash
-                $query->leftJoin('study_language_students', 'students.id', '=', 'study_language_students.student_id')
-                    ->select('students.*')
-                    ->groupBy('students.id')
-                    ->orderBy(
-                        \DB::raw('MIN(study_language_students.language)'),
-                        $this->sortDirection
-                    );
-                break;
-            case 'level':
-                $query->leftJoin('knowledge_levels', 'students.knowledge_level_id', '=', 'knowledge_levels.id')
-                    ->orderBy('knowledge_levels.name', $this->sortDirection)
-                    ->select('students.*');
-                break;
-            case 'study_days':
-                // Dars kunlari bo'yicha tartiblash
-                $query->leftJoin('study_day_students', 'students.id', '=', 'study_day_students.student_id')
-                    ->select('students.*')
-                    ->groupBy('students.id')
-                    ->orderBy(
-                        \DB::raw('MIN(study_day_students.day)'),
-                        $this->sortDirection
-                    );
+            case 'created_at': // Add other direct columns here
+                $query->orderBy($this->sortField, $this->sortDirection);
                 break;
             default:
-                $query->orderBy($this->sortField, $this->sortDirection);
+                $query->orderBy('created_at', 'desc'); // Default sort
                 break;
         }
     }
 
-    private function applyFilters($query)
+
+    private function applyFilters(Builder $query)
     {
-        if ($this->isFilterActive) {
-            if ($this->selectedBranch) {
-                $query->where('branch_id', $this->selectedBranch);
-            }
-            if ($this->selectedGroup) {
-                $query->whereHas('groups', function ($groupQuery) {
-                    $groupQuery->where('groups.id', $this->selectedGroup);
-                });
-            }
+        if ($this->selectedBranch) { // No need for isFilterActive check if using wire:model
+            $query->where('branch_id', $this->selectedBranch);
+        }
+        if ($this->selectedGroup) {
+            $query->whereHas('groups', function ($groupQuery) {
+                $groupQuery->where('groups.id', $this->selectedGroup);
+            });
         }
     }
-    private function applySearch($query)
+
+    private function applySearch(Builder $query)
     {
-        if ($this->isSearchActive && $this->search) {
-            $query->where(function ($query) {
-                $query->where('first_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('phone', 'like', '%' . $this->search . '%')
-                    ->orWhere('passport_number', 'like', '%' . $this->search . '%');
+        if ($this->search) { // No need for isSearchActive check
+            $searchTerm = '%' . $this->search . '%';
+            $query->where(function ($subQuery) use ($searchTerm) {
+                $subQuery->where('first_name', 'like', $searchTerm)
+                    ->orWhere('last_name', 'like', $searchTerm)
+                    ->orWhere('phone', 'like', $searchTerm)
+                    ->orWhere('passport_number', 'like', $searchTerm)
+                    ->orWhere('id', $this->search); // Allow searching by ID
             });
         }
     }
@@ -193,28 +190,90 @@ class StudentsPage extends Page
             'search',
             'selectedBranch',
             'selectedGroup',
-            'isFilterActive',
-            'isSearchActive'
+            // 'isFilterActive', // Not needed with wire:model approach
+            // 'isSearchActive' // Not needed with wire:model approach
         ]);
         $this->resetPage();
     }
-    public function updatedSearch()
-    {
-        $this->resetPage();
-    }
 
-    public function updatedSelectedBranch()
-    {
-        $this->resetPage();
-    }
+    // These updated methods are automatically called by Livewire with wire:model.live or .debounce
+    public function updatedSearch() { $this->resetPage(); }
+    public function updatedSelectedBranch() { $this->resetPage(); }
+    public function updatedSelectedGroup() { $this->resetPage(); }
 
-    public function updatedSelectedGroup()
-    {
-        $this->resetPage();
-    }
     public function showStudentProfile($studentId): void
     {
-        $student = Student::findOrFail($studentId);
-        $this->redirect(StudentProfilePage::getUrl(['record' => $student]));
+        // No need to findOrFail here, route model binding handles it
+        $this->redirect(StudentProfilePage::getUrl(['record' => $studentId]));
     }
+
+    // --- Student Removal Logic ---
+    public function openRemoveStudentModal(int $studentId, string $studentName): void
+    {
+        $this->studentToRemoveId = $studentId;
+        $this->studentToRemoveName = $studentName;
+        $this->removalReasonId = null;
+        $this->resetErrorBag();
+        $this->showRemoveStudentModal = true;
+    }
+
+    public function removeStudent() // Return type removed for flexibility
+    {
+        if (!$this->studentToRemoveId) {
+             Notification::make()
+                ->title('Xatolik')
+                ->body('Safdan chiqariladigan student aniqlanmadi.')
+                ->danger()
+                ->send();
+             return null;
+        }
+
+        try {
+            $validatedData = $this->validateOnly('removalReasonId', [
+                'removalReasonId' => ['required', 'integer', 'exists:removal_reasons,id'],
+            ], [
+                'removalReasonId.required' => 'Iltimos, safdan chiqarish sababini tanlang.',
+                'removalReasonId.exists' => 'Tanlangan sabab mavjud emas.',
+            ]);
+        } catch (ValidationException $e) {
+            return null; // Keep modal open
+        }
+
+        try {
+            $student = Student::find($this->studentToRemoveId);
+            if (!$student) {
+                 Notification::make()->title('Xatolik')->body('Student topilmadi.')->danger()->send();
+                 $this->showRemoveStudentModal = false; // Close modal if student not found
+                 return null;
+            }
+
+            $student->removal_reason_id = $validatedData['removalReasonId'];
+            $student->save();
+            $student->delete(); // Soft delete
+
+            $removedName = $this->studentToRemoveName; // Store name before resetting
+            $this->showRemoveStudentModal = false;
+            $this->studentToRemoveId = null;
+            $this->studentToRemoveName = null;
+
+
+            Notification::make()
+                ->title('Muvaffaqiyatli')
+                ->body($removedName . ' muvaffaqiyatli safdan chiqarildi.')
+                ->success()
+                ->send();
+
+            // No redirect needed, Livewire will refresh the list
+
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Xatolik')
+                ->body('Studentni safdan chiqarishda xatolik yuz berdi: ' . $e->getMessage())
+                ->danger()
+                ->send();
+
+            return null;
+        }
+    }
+    // --- End Student Removal Logic ---
 }

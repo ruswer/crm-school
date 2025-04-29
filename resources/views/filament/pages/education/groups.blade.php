@@ -1,266 +1,170 @@
 <x-filament::page>
-    <div class="flex flex-col lg:flex-row gap-4">
-        <!-- Chap panel (30%) -->
-        <div class="w-full lg:w-[30%] bg-white rounded-lg shadow-sm p-4">
-            <h2 class="text-lg font-medium text-gray-900 mb-4 pb-4 border-b">Guruh qo'shish</h2>
-            <form class="space-y-4">
-                <!-- Guruh nomi -->
-                <div>
-                    <label for="group_name" class="block text-sm font-medium text-gray-700">Guruh nomi</label>
-                    <input type="text" id="group_name" name="group_name" 
-                           placeholder="Guruh nomini kiriting"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                </div>
+    <div class="flex flex-col lg:flex-row lg:items-start gap-4">
+        {{-- Chap panel (Guruh qo'shish) --}}
+        <div class="w-full lg:w-[30%] bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 flex-shrink-0">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-4 border-b dark:border-gray-700">Guruh qo'shish</h2>
+            {{-- Forma --}}
+            <form wire:submit.prevent="createGroup" class="space-y-4">
+                {{ $this->createGroupForm }}
 
-                <!-- Filial -->
-                <div>
-                    <label for="branch" class="block text-sm font-medium text-gray-700">Filial</label>
-                    <select id="branch" name="branch" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="">Filialni tanlang</option>
-                    </select>
-                </div>
-
-                <!-- Guruh turi -->
-                <div>
-                    <label for="groupType" class="block text-sm font-medium text-gray-700">Guruh turi</label>
-                    <select id="brangroupTypech" name="groupType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="active">Faol</option>
-                        <option value="waiting">Kutilmoqda</option>
-                    </select>
-                </div>
-
-                <!-- Kurs -->
-                <div>
-                    <label for="course" class="block text-sm font-medium text-gray-700">Kurs</label>
-                    <select id="course" name="course" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="">Tanlang</option>
-                        <option value="">Ingliz tili</option>
-                        <option value="">Web dasturlash</option>
-                    </select>
-                </div>
-
-                <!-- Daraja -->
-                <div>
-                    <label for="degree" class="block text-sm font-medium text-gray-700">Daraja</label>
-                    <select id="degree" name="degree" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="">Tanlang</option>
-                        <option value="">Boshlang'ich</option>
-                        <option value="">O'rta</option>
-                    </select>
-                </div>
-
-                <!-- O'qituvchi -->
-                <div>
-                    <label for="teacher" class="block text-sm font-medium text-gray-700">O'qituvchi</label>
-                    <select id="teacher" name="teacher" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="">O'qituvchini tanlang</option>
-                    </select>
-                </div>
-
-                <!-- O'qituvchi maosh turi -->
-                <div>
-                    <label for="teacherSalaryType" class="block text-sm font-medium text-gray-700">O'qituvchi maoshi turi</label>
-                    <select id="teacherSalaryType" name="teacherSalaryType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="">O'qituvchini tanlang</option>
-                    </select>
-                </div>
-
-                <!-- Maosh miqdori -->
-                <div class="relative">
-                    <label for="salaryType" class="block text-sm font-medium text-gray-700">Maosh miqdori</label>
-                    <div class="relative mt-1">
-                        <input type="number" id="salaryType" name="salaryType" 
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm pr-16">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span class="text-gray-500 sm:text-sm">UZS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarif davri -->
-                <div>
-                    <label for="tarifPeriod" class="block text-sm font-medium text-gray-700">Tarif davri</label>
-                    <select id="tarifPeriod" name="teacherSatarifPeriodlaryType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                        <option value="">1oy</option>
-                        <option value="">2oy</option>
-                        <option value="">3oy</option>
-                        <option value="">4oy</option>
-                        <option value="">5oy</option>
-                        <option value="">6oy</option>
-                        <option value="">7oy</option>
-                        <option value="">8oy</option>
-                    </select>
-                </div>
-
-                <!-- Kunlar -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Kunlar</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="monday" name="days[]" value="monday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="monday" class="ml-2 text-sm text-gray-700">Dushanba</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="tuesday" name="days[]" value="tuesday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="tuesday" class="ml-2 text-sm text-gray-700">Seshanba</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="wednesday" name="days[]" value="wednesday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="wednesday" class="ml-2 text-sm text-gray-700">Chorshanba</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="thursday" name="days[]" value="thursday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="thursday" class="ml-2 text-sm text-gray-700">Payshanba</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="friday" name="days[]" value="friday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="friday" class="ml-2 text-sm text-gray-700">Juma</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="saturday" name="days[]" value="saturday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="saturday" class="ml-2 text-sm text-gray-700">Shanba</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="sunday" name="days[]" value="sunday"
-                                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <label for="sunday" class="ml-2 text-sm text-gray-700">Yakshanba</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Kurs narxi -->
-                <div class="relative">
-                    <label for="totalPrice" class="block text-sm font-medium text-gray-700">Kurs narxi</label>
-                    <div class="relative mt-1">
-                        <input type="number" id="totalPrice" name="totalPrice" 
-                            placeholder="Masalan, 1200000"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm pr-16">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span class="text-gray-500 sm:text-sm">UZS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Darslar soni -->
-                <div>
-                    <label for="lessonsCount" class="block text-sm font-medium text-gray-700">Darslar soni</label>
-                    <input type="number" id="lessonsCount" name="lessonsCount" 
-                        placeholder="Masalan, 12"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                </div>
-
-                <!-- Bitta dars narxi (readonly) -->
-                <div class="relative">
-                    <label for="coursePrice" class="block text-sm font-medium text-gray-700">Bitta dars narxi</label>
-                    <div class="relative mt-1">
-                        <input type="number" id="coursePrice" name="coursePrice" 
-                            readonly
-                            class="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm pr-16">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span class="text-gray-500 sm:text-sm">UZS</span>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Saqlash tugmasi -->
+                {{-- Saqlash tugmasi --}}
                 <div class="flex justify-end pt-4">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <x-filament::button type="submit" wire:loading.attr="disabled">
+                         <svg wire:loading wire:target="createGroup" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                         Saqlash
-                    </button>
+                    </x-filament::button>
                 </div>
             </form>
         </div>
 
-        <!-- O'ng panel (70%) -->
-        <div class="w-full lg:w-[70%] bg-white rounded-lg shadow-sm p-4">
-            <h2 class="text-lg font-medium text-gray-900 mb-4 pb-4 border-b">Guruhlar ro'yxati</h2>
+        {{-- O'ng panel (Guruhlar ro'yxati) --}}
+        <div class="w-full lg:w-[70%] bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-4 border-b dark:border-gray-700">Guruhlar ro'yxati</h2>
 
-            <!-- Status filterlari -->
-            <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1 mb-4" x-data="{ selected: 'active' }">
-                <button type="button"
-                        @click="selected = 'active'"
-                        :class="{
-                            'bg-green-600 shadow-sm text-white': selected === 'active',
-                            'hover:bg-gray-100 text-gray-600': selected !== 'active'
-                        }"
-                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
-                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Faol (23)
-                </button>
-            
-                <button type="button"
-                        @click="selected = 'waiting'"
-                        :class="{
-                            'bg-gray-500 shadow-sm text-white': selected === 'waiting',
-                            'hover:bg-gray-100 text-gray-600': selected !== 'waiting'
-                        }"
-                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
-                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Kutilmoqda (12)
-                </button>
-            
-                <button type="button"
-                        @click="selected = 'deleted'"
-                        :class="{
-                            'bg-red-600 shadow-sm text-white': selected === 'deleted',
-                            'hover:bg-gray-100 text-gray-600': selected !== 'deleted'
-                        }"
-                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
-                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    O'chirilgan (8)
-                </button>
+            {{-- Status filterlari --}}
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                {{-- Status filterlari --}}
+                <div class="inline-flex rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1" x-data="{ selected: @entangle('selectedStatus') }">
+                    <button type="button"
+                            wire:click="filterByStatus('active')"
+                            :class="{
+                                'bg-green-600 shadow-sm text-white': selected === 'active',
+                                'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300': selected !== 'active'
+                            }"
+                            class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Faol
+                    </button>
+
+                    <button type="button"
+                            wire:click="filterByStatus('waiting')"
+                            :class="{
+                                'bg-gray-500 shadow-sm text-white': selected === 'waiting',
+                                'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300': selected !== 'waiting'
+                            }"
+                            class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Kutilmoqda
+                    </button>
+
+                    <button type="button"
+                            wire:click="filterByStatus('deleted')"
+                            :class="{
+                                'bg-red-600 shadow-sm text-white': selected === 'deleted',
+                                'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300': selected !== 'deleted'
+                            }"
+                            class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        O'chirilgan
+                    </button>
+                </div>
             </div>
-            <!-- Table wrapper -->
-            <div x-data="sortableTable">
+
+            {{-- Jadval --}}
+            <div class="overflow-x-auto">
                 <table class="min-w-full text-left text-sm whitespace-nowrap">
-                    <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-gray-100 text-gray-800">
+                    <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
                         <tr>
-                            <th scope="col" class="px-6 py-4">
-                                <div class="flex items-center gap-x-1 cursor-pointer group" @click="sort('group')">
+                            {{-- Guruh ustuni --}}
+                            <th scope="col" class="px-6 py-3 cursor-pointer" wire:click="sortBy('name')">
+                                <div class="flex items-center gap-x-1">
                                     <span>Guruh</span>
-                                    <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-500" 
-                                        :class="{ 'rotate-180': sortField === 'group' && sortDirection === 'desc' }"
-                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
+                                    <x-heroicon-s-chevron-up-down class="w-4 h-4 {{ $sortField === 'name' ? '' : 'text-gray-400' }}" />
                                 </div>
                             </th>
-                            <th scope="col" class="px-6 py-4">
-                                <div class="flex items-center gap-x-1 cursor-pointer group" @click="sort('course')">
-                                    <span>Kurs</span>
-                                    <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-500"
-                                        :class="{ 'rotate-180': sortField === 'course' && sortDirection === 'desc' }"
-                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
+                            {{-- O'qituvchi ustuni --}}
+                             <th scope="col" class="px-6 py-3 cursor-pointer" wire:click="sortBy('teacher_id')">
+                                <div class="flex items-center gap-x-1">
+                                    <span>O'qituvchi</span>
+                                     <x-heroicon-s-chevron-up-down class="w-4 h-4 {{ $sortField === 'teacher_id' ? '' : 'text-gray-400' }}" />
                                 </div>
                             </th>
-                            <!-- Boshqa ustunlar... -->
+                            {{-- O'quvchilar soni ustuni --}}
+                             <th scope="col" class="px-6 py-3">
+                                <span>O'quvchilar soni</span>
+                            </th>
+                            {{-- Amallar ustuni --}}
+                            <th scope="col" class="px-6 py-3 text-right">Amallar</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Table rows with data-field attributes -->
-                        <tr class="border-b dark:border-neutral-600">
-                            <td data-field="group" class="px-6 py-4">Guruh A</td>
-                            <td data-field="course" class="px-6 py-4">Frontend</td>
-                            <!-- Boshqa maydonlar... -->
-                        </tr>
+                        @forelse($this->groups as $group)
+                            <tr class="border-b dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-gray-700" wire:key="group-{{ $group->id }}">
+                                {{-- Guruh nomi --}}
+                                <td class="px-6 py-4">{{ $group->name }}</td>
+                                {{-- O'qituvchi nomi --}}
+                                <td class="px-6 py-4">{{ $group->teacher->fullName ?? 'N/A' }}</td>
+                                {{-- O'quvchilar soni --}}
+                                <td class="px-6 py-4">{{ $group->students_count ?? $group->students()->count() }}</td>
+                                {{-- Amallar --}}
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex justify-end items-center gap-2">
+                                        @if($selectedStatus === 'deleted')
+                                            {{-- Tiklash tugmasi --}}
+                                            <button type="button" wire:click="restoreGroup({{ $group->id }})" title="Tiklash"
+                                                    class="text-yellow-500 hover:text-yellow-700">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                </svg>
+                                            </button>
+                                            {{-- Butunlay o'chirish tugmasi --}}
+                                            <button type="button" wire:click="deleteGroup({{ $group->id }})"
+                                                    wire:confirm="Haqiqatan ham bu guruhni butunlay o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!"
+                                                    title="Butunlay o'chirish" class="text-red-600 hover:text-red-900">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        @else
+                                            {{-- Tahrirlash tugmasi --}}
+                                            <button type="button" wire:click="editGroup({{ $group->id }})" title="Tahrirlash"
+                                                    class="text-blue-600 hover:text-blue-900">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.796a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>
+                                            </button>
+                                            {{-- O'chirish (arxivlash) tugmasi --}}
+                                            <button type="button" wire:click="deleteGroup({{ $group->id }})"
+                                                    wire:confirm="Haqiqatan ham bu guruhni o'chirmoqchimisiz (arxivlamoqchimisiz)?"
+                                                    title="O'chirish (Arxiv)" class="text-red-600 hover:text-red-900">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                {{-- Colspan 4 ga o'zgartirildi --}}
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                    {{ $selectedStatus === 'deleted' ? 'O\'chirilgan guruhlar topilmadi.' : ($selectedStatus === 'waiting' ? 'Kutilayotgan guruhlar topilmadi.' : 'Faol guruhlar topilmadi.') }}
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
+
+            {{-- Paginatsiya --}}
+            <div class="mt-4">
+                {{ $this->groups->links() }}
+            </div>
+
         </div>
     </div>
+
+    {{-- Tahrirlash uchun Modal --}}
+    {{-- ... --}}
+
 </x-filament::page>

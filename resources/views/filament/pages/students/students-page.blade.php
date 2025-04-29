@@ -149,51 +149,60 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if($this->students->total() === 0 && !$this->isFilterActive && !$this->isSearchActive)
-                            <!-- Database Empty state - faqat bazada umuman ma'lumot yo'q bo'lganda -->
-                            <div class="text-center py-12">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900">O'quvchilar mavjud emas</h3>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Hozircha tizimda birorta ham o'quvchi ro'yxatdan o'tkazilmagan.
-                                </p>
-                                <div class="mt-6">
-                                    <x-filament::button
-                                        tag="a"
-                                        href="{{ url('/admin/add-student') }}"
-                                        color="primary"
-                                        icon="heroicon-o-plus"
-                                    >
-                                        O'quvchi qo'shish
-                                    </x-filament::button>
-                                </div>
-                            </div>
-                        @elseif($this->students->isEmpty() && ($this->isFilterActive || $this->isSearchActive))
-                            <!-- Search Empty state - qidiruv natijasi bo'sh bo'lganda -->
-                            <div class="text-center py-12">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                </svg>
-                                <h3 class="mt-2 text-sm font-medium text-gray-900">Ma'lumot topilmadi</h3>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Sizning so'rovingiz bo'yicha hech qanday ma'lumot topilmadi.
-                                </p>
-                                <div class="mt-6">
-                                    <button
-                                        wire:click="resetFilters"
-                                        type="button"
-                                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                    >
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                        </svg>
-                                        Filterni tozalash
-                                    </button>
-                                </div>
-                            </div>
+                        @if($this->students->isEmpty())
+                            <tr>
+                                {{-- Calculate the number of columns based on your thead --}}
+                                {{-- 9 data columns + 1 action column = 10 --}}
+                                <td colspan="10"> 
+                                    @if(!$this->isFilterActive && !$this->isSearchActive)
+                                        {{-- Initial Database Empty state --}}
+                                        <div class="text-center py-12">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                            <h3 class="mt-2 text-sm font-medium text-gray-900">O'quvchilar mavjud emas</h3>
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                Hozircha tizimda birorta ham o'quvchi ro'yxatdan o'tkazilmagan.
+                                            </p>
+                                            <div class="mt-6">
+                                                <x-filament::button
+                                                    tag="a"
+                                                    href="{{ url('/admin/add-student') }}"
+                                                    color="primary"
+                                                    icon="heroicon-o-plus"
+                                                >
+                                                    O'quvchi qo'shish
+                                                </x-filament::button>
+                                            </div>
+                                        </div>
+                                    @else
+                                        {{-- Search/Filter Empty state --}}
+                                        <div class="text-center py-12">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                            </svg>
+                                            <h3 class="mt-2 text-sm font-medium text-gray-900">Ma'lumot topilmadi</h3>
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                Sizning so'rovingiz bo'yicha hech qanday ma'lumot topilmadi.
+                                            </p>
+                                            <div class="mt-6">
+                                                <button
+                                                    wire:click="resetFilters"
+                                                    type="button"
+                                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                >
+                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                    </svg>
+                                                    Filterni tozalash
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
                         @else
+                            {{-- Loop through students when results are found --}}
                             @foreach($this->students as $student)
                                 <tr class="border-b dark:border-neutral-600">
                                     <td class="px-6 py-4">
@@ -207,43 +216,147 @@
                                     <td class="px-6 py-4">{{ $student->status->name }}</td>
                                     <td class="px-6 py-4">{{ $student->courses->first()->name ?? '-' }}</td>
                                     <td class="px-6 py-4">
-                                        @foreach($student->groups as $group)
-                                            {{ $group->name }}{{ !$loop->last ? ', ' : '' }}
-                                        @endforeach
+                                        {{ $student->groups->pluck('name')->implode(', ') }} {{-- More concise way to list groups --}}
                                     </td>
                                     <td class="px-6 py-4">{{ $student->phone }}</td>
                                     <td class="px-6 py-4">
-                                        @if($student->studyLanguagesStudents && $student->studyLanguagesStudents->count() > 0)
-                                            @foreach($student->studyLanguagesStudents as $language)
-                                                {{ $language->language }}{{ !$loop->last ? ', ' : '' }}
-                                            @endforeach
-                                        @else
-                                            -
-                                        @endif
+                                        {{-- Simplified language display --}}
+                                        {{ $student->studyLanguagesStudents->pluck('language')->implode(', ') ?: '-' }}
                                     </td>
                                     <td class="px-6 py-4">{{ $student->knowledgeLevel->name ?? '-' }}</td>
                                     <td class="px-6 py-4">
-                                        @foreach($student->studyDays as $day)
-                                            {{ $day->day }}{{ !$loop->last ? '/' : '' }}
-                                        @endforeach
+                                        {{-- Simplified study days display --}}
+                                        {{ $student->studyDays->pluck('day')->implode('/') ?: '-' }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        <a href="#" 
-                                        wire:click="editStudent({{ $student->id }})" 
-                                        class="text-blue-600 hover:text-blue-900">
-                                            <svg xmlns="http://www.w3.org/2000/svg" 
-                                                fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
-                                                stroke="currentColor" class="w-5 h-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" 
-                                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L9.38 17.273a4.5 4.5 0 01-1.897 1.13l-2.745.823.823-2.745a4.5 4.5 0 011.13-1.897l10.171-10.17z" />
-                                            </svg>
-                                        </a>
+                                        <div class="flex items-center space-x-2">
+                                            {{-- Edit button --}}
+                                            <a href="#"
+                                               wire:click="editStudent({{ $student->id }})"
+                                               class="text-blue-600 hover:text-blue-900"
+                                               title="Tahrirlash">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                     fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                     stroke="currentColor" class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L9.38 17.273a4.5 4.5 0 01-1.897 1.13l-2.745.823.823-2.745a4.5 4.5 0 011.13-1.897l10.171-10.17z" />
+                                                </svg>
+                                            </a>
+                            
+                                            {{-- Remove button --}}
+                                            <button type="button"
+                                                    wire:click="openRemoveStudentModal({{ $student->id }}, '{{ $student->first_name }} {{ $student->last_name }}')"
+                                                    class="text-red-600 hover:text-red-900"
+                                                    title="Safdan chiqarish">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
                         @endif
                     </tbody>
+
                 </table>
+
+                {{-- Safdan chiqarish Modali --}}
+                @if($showRemoveStudentModal)
+                    <div class="fixed inset-0 z-[1999] overflow-y-auto"
+                        aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                            {{-- Modal foni --}}
+                            <div x-data
+                                x-show="$wire.showRemoveStudentModal"
+                                x-transition:enter="ease-out duration-300"
+                                x-transition:enter-start="opacity-0"
+                                x-transition:enter-end="opacity-100"
+                                x-transition:leave="ease-in duration-200"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                                aria-hidden="true"
+                                @click="$wire.set('showRemoveStudentModal', false)"></div> {{-- Fonni bosganda yopish --}}
+
+                            {{-- Modal kontenti --}}
+                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                            <div x-data
+                                x-show="$wire.showRemoveStudentModal"
+                                x-transition:enter="ease-out duration-300"
+                                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                x-transition:leave="ease-in duration-200"
+                                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+                                <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                                    <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">
+                                        Studentni Safdan Chiqarish
+                                    </h3>
+                                    <button type="button" @click="$wire.set('showRemoveStudentModal', false)" class="text-gray-400 hover:text-gray-500">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div class="mt-6 space-y-4">
+                                    <p class="text-sm text-gray-600">
+                                        {{-- Student ismini dinamik ko'rsatish --}}
+                                        Haqiqatan ham **{{ $studentToRemoveName ?? 'tanlangan student' }}**ni safdan chiqarmoqchimisiz? Iltimos, sababini tanlang:
+                                    </p>
+
+                                    {{-- Sababni tanlash --}}
+                                    <div>
+                                        <label for="removal_reason_id_list" class="block text-sm font-medium text-gray-700 sr-only">
+                                            Safdan chiqarish sababi
+                                        </label>
+                                        <select id="removal_reason_id_list" {{-- ID ni boshqacha qildim --}}
+                                                wire:model.live="removalReasonId"
+                                                class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm @error('removalReasonId') border-red-500 @enderror">
+                                            <option value="">Sababni tanlang...</option>
+                                            @foreach($removalReasonsOptions as $id => $name)
+                                                <option value="{{ $id }}">{{ $name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('removalReasonId')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="pt-5 mt-6 border-t border-gray-200 sm:flex sm:flex-row-reverse">
+                                    <button type="button"
+                                            wire:click="removeStudent" {{-- Bu metod StudentsPage da bo'lishi kerak --}}
+                                            wire:loading.attr="disabled"
+                                            wire:loading.class="opacity-75 cursor-wait"
+                                            class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                                        <span wire:loading wire:target="removeStudent" class="mr-2">
+                                            <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        </span>
+                                        <span wire:loading.remove wire:target="removeStudent">
+                                            Safdan Chiqarish
+                                        </span>
+                                        <span wire:loading wire:target="removeStudent">
+                                            Bajarilmoqda...
+                                        </span>
+                                    </button>
+                                    <button type="button"
+                                            @click="$wire.set('showRemoveStudentModal', false)"
+                                            wire:loading.attr="disabled"
+                                            class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
+                                        Bekor qilish
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="mt-4 px-4 py-3 bg-white border-t">
                     @if($this->students->hasPages())

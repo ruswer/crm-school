@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Staff extends Model
 {
@@ -19,8 +20,10 @@ class Staff extends Model
         return $this->hasMany(Student::class, 'trial_teacher_id');
     }
 
-    public function getFullNameAttribute()
+    protected function fullName(): Attribute
     {
-        return "{$this->first_name} {$this->last_name}";
+        return Attribute::make(
+            get: fn () => "{$this->first_name} {$this->last_name}",
+        );
     }
 }

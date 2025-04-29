@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->viteTheme('resources/css/app.css')
+            ->viteTheme('resources/css/app.css',)
             ->login()
             ->colors([
                 'primary' => Color::Amber,
@@ -74,6 +74,8 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Education\Courses::class,
                 \App\Filament\Pages\Education\KnowledgeLevels::class,
                 \App\Filament\Pages\Education\Cabinets::class,
+                \App\Filament\Pages\Education\LessonSchedule::class,
+                \App\Filament\Pages\Education\CreateSchedulePage::class,
 
                 ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
@@ -100,6 +102,7 @@ class AdminPanelProvider extends PanelProvider
     {
         FilamentAsset::register([
             Js::make('app', asset('js/filament/filament/app.js')),
+            Css::make('custom', asset('css/filament/filament/custom.css')),
         ]);
     }
 }

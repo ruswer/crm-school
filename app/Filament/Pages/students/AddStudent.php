@@ -12,7 +12,10 @@ use App\Models\Student;
 use App\Models\Parents;
 use App\Models\Staff;
 use App\Models\StudentStatus;
+use App\Models\Authorization;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Filament\Notifications\Notification;
 
 class AddStudent extends Page
@@ -38,8 +41,6 @@ class AddStudent extends Page
         'status_id' => '',
         'notes' => '',
         'marketing_source_id' => '',
-        'additional_details' => '',
-        
     ];
 
     // O'qish ma'lumotlari
@@ -68,8 +69,10 @@ class AddStudent extends Page
     public array $options = [
         'branches' => [],
         'groups' => [],
+        'studentStatuses' => [], 
         'courses' => [],
         'teachers' => [],
+        'knowledgeLevels' => [],
         'marketingSources' => [],
     ];
 
@@ -78,11 +81,11 @@ class AddStudent extends Page
         if (empty($this->form['group_ids'])) {
             return 'Guruhlarni tanlang';
         }
-    
+
         $selectedGroups = Group::whereIn('id', $this->form['group_ids'])
             ->pluck('name')
             ->join(', ');
-    
+
         return $selectedGroups ?: 'Guruhlarni tanlang';
     }
 
@@ -99,114 +102,161 @@ class AddStudent extends Page
             'marketingSources' => MarketingSource::where('status', 'active')->get(),
         ];
 
-        $this->form = [
-            'group_ids' => [], // Guruhlar uchun bo'sh array
-        ];
+        // Formani boshlang'ich holatga keltirish (mount da)
+        $this->resetForm();
     }
 
     public function save($createAnother = false)
     {
-        // Validatsiya
+        // Yangilangan Validatsiya
         $this->validate([
-            'form.passport_number' => 'required|unique:students,passport_number',
+            // --- Student Asosiy Ma'lumotlari ---
+            'form.passport_number' => 'nullable|string|max:255|unique:students,passport_number',
             'form.branch_id' => 'required|exists:branches,id',
-            'form.group_ids' => 'required|array|min:1',
+            'form.group_ids' => 'nullable|array',
             'form.group_ids.*' => 'exists:groups,id',
             'form.first_name' => 'required|string|max:255',
             'form.last_name' => 'required|string|max:255',
             'form.gender' => 'required|in:male,female',
-            'form.birth_date' => 'required|date',
-            'form.phone' => 'required|string|max:255',
-            'form.email' => 'nullable|email|max:255',
+            'form.birth_date' => 'required|date|before:today',
+            'form.phone' => 'required|string|max:255|unique:students,phone', 
+            'form.email' => 'nullable|email|max:255|unique:students,email',
             'form.status_id' => 'required|exists:student_statuses,id',
-            'study.language' => 'required|array',
+
+            // --- O'qish Ma'lumotlari ---
+            'study.language' => 'nullable|array', 
             'study.course_id' => 'nullable|exists:courses,id',
-            'study.knowledge_level_id' => 'required|exists:knowledge_levels,id',
-            'study.days' => 'required|array',
+            'study.knowledge_level_id' => 'nullable|exists:knowledge_levels,id', 
+            'study.days' => 'nullable|array', 
+
+            // --- Marketing va Izoh ---
             'form.marketing_source_id' => 'required|exists:marketing_sources,id',
-            'form.additional_details' => 'nullable|string',
-            'trial.teacher_id' => 'required|exists:staff,id',
-            'trial.called_at' => 'required|date',
-            'trial.attended_at' => 'required|date',
-            'parent.parentsName' => 'required|string|max:255',
-            'parent.parentsPhone' => 'required|string|max:255',
-            'parent.parentsEmail' => 'nullable|email|max:255',
+            'form.notes' => 'nullable|string', // Nom to'g'ri
+
+            // --- Sinov Darsi Ma'lumotlari ---
+            'trial.teacher_id' => 'nullable|exists:staff,id', 
+            'trial.called_at' => 'nullable|date', 
+            'trial.attended_at' => 'nullable|date|after_or_equal:trial.called_at', 
+
+            // --- Ota-ona Ma'lumotlari ---
+            'parent.parentsName' => 'nullable|string|max:255', 
+            'parent.parentsPhone' => 'nullable|string|max:255|unique:parents,phone', 
+            'parent.parentsEmail' => 'nullable|email|max:255|unique:parents,email',
         ]);
 
         try {
             DB::beginTransaction();
-    
-            // O'quvchi ma'lumotlarini saqlash (study_language va study_days maydonlarisiz)
+
+            // O'quvchi ma'lumotlarini saqlash
             $student = Student::create([
-                'passport_number' => $this->form['passport_number'],
+                'passport_number' => $this->form['passport_number'] ?: null,
                 'branch_id' => $this->form['branch_id'],
                 'first_name' => $this->form['first_name'],
                 'last_name' => $this->form['last_name'],
                 'gender' => $this->form['gender'],
                 'birth_date' => $this->form['birth_date'],
                 'phone' => $this->form['phone'],
-                'email' => $this->form['email'],
+                'email' => $this->form['email'] ?: null,
                 'status_id' => $this->form['status_id'],
-                'knowledge_level_id' => $this->study['knowledge_level_id'],
-                'notes' => $this->form['notes'],
-                'trial_teacher_id' => $this->trial['teacher_id'],
-                'trial_called_at' => $this->trial['called_at'],
-                'trial_attended_at' => $this->trial['attended_at'],
+                'knowledge_level_id' => $this->study['knowledge_level_id'] ?: null,
+                'notes' => $this->form['notes'] ?: null,
+                'trial_teacher_id' => $this->trial['teacher_id'] ?: null,
+                'trial_called_at' => $this->trial['called_at'] ?: null,
+                'trial_attended_at' => $this->trial['attended_at'] ?: null,
                 'marketing_source_id' => $this->form['marketing_source_id'],
             ]);
 
-             // Guruhlarni saqlash
+            // Guruhlarni saqlash
             if (!empty($this->form['group_ids'])) {
                 $student->groups()->attach($this->form['group_ids']);
             }
 
             // O'qish tillarini saqlash
             if (!empty($this->study['language'])) {
-                foreach ($this->study['language'] as $language) {
-                    $student->studyLanguages()->create([
-                        'language' => $language
+                foreach ($this->study['language'] as $languageValue) {
+                    $student->studyLanguagesStudents()->create([
+                        'language' => $languageValue
                     ]);
                 }
             }
-    
+
             // O'qish kunlarini saqlash
             if (!empty($this->study['days'])) {
-                foreach ($this->study['days'] as $day) {
-                    $student->studyDays()->create([
-                        'day' => $day
-                    ]);
-                }
-            }
-    
+                foreach ($this->study['days'] as $dayValue) {
+                   $student->studyDayStudents()->create([
+                       'day' => $dayValue
+                   ]);
+               }
+           }
+
             // Kursga yozish
             if ($this->study['course_id']) {
                 $student->courses()->attach($this->study['course_id']);
             }
-    
-            // Ota-ona ma'lumotlarini saqlash
-            Parents::create([
-                'student_id' => $student->id,
-                'full_name' => $this->parent['parentsName'],
-                'phone' => $this->parent['parentsPhone'],
-                'email' => $this->parent['parentsEmail'],
+
+            // Ota-ona ma'lumotlarini saqlash (agar kiritilgan bo'lsa)
+            $parent = null;
+            if (!empty($this->parent['parentsName']) && !empty($this->parent['parentsPhone'])) {
+                $parent = Parents::create([
+                    'student_id' => $student->id,
+                    'full_name' => $this->parent['parentsName'],
+                    'phone' => $this->parent['parentsPhone'],
+                    'email' => $this->parent['parentsEmail'],
+                ]);
+            }
+
+            // --- Avtorizatsiya ma'lumotlarini generatsiya qilish ---
+
+            // Student uchun Login/Parol Generatsiyasi (har doim)
+            $studentLoginBase = strtolower(substr($student->first_name, 0, 1) . $student->last_name);
+            $studentLogin = $this->generateUniqueLogin($studentLoginBase);
+            $studentPlainPassword = Str::random(8);
+
+            $student->authorization()->create([
+                'login' => $studentLogin,
+                'password' => Hash::make($studentPlainPassword),
             ]);
-    
+
+            // Ota-ona uchun Login/Parol Generatsiyasi (agar ota-ona yaratilgan bo'lsa)
+            $parentLogin = null;
+            $parentPlainPassword = null;
+            if ($parent) {
+                $parentLoginBase = strtolower(str_replace(' ', '', $parent->full_name));
+                $parentLogin = $this->generateUniqueLogin($parentLoginBase . '_p');
+                $parentPlainPassword = Str::random(8);
+
+                $parent->authorization()->create([
+                    'login' => $parentLogin,
+                    'password' => Hash::make($parentPlainPassword),
+                ]);
+            }
+
             DB::commit();
-    
+
+            // Muvaffaqiyatli xabar
+            $notificationBody = "O'quvchi: Login: {$studentLogin}, Parol: {$studentPlainPassword}\n";
+            if ($parentLogin && $parentPlainPassword) {
+                $notificationBody .= "Ota-ona: Login: {$parentLogin}, Parol: {$parentPlainPassword}";
+            }
+
             Notification::make()
                 ->title('O\'quvchi muvaffaqiyatli qo\'shildi')
+                ->body($notificationBody)
                 ->success()
+                ->persistent()
                 ->send();
-    
+
+
             if ($createAnother) {
                 $this->resetForm();
             } else {
-                return redirect()->to('/admin/students');
+                // StudentsPage ga yo'naltirish (Filament route nomidan foydalanish)
+                return redirect()->route('filament.admin.pages.students');
             }
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Notification::make()
                 ->title('Xatolik yuz berdi')
                 ->body($e->getMessage())
@@ -215,27 +265,49 @@ class AddStudent extends Page
         }
     }
 
-    // Formani tozalash
+
+    /**
+     * Noyob login generatsiya qilish uchun yordamchi funksiya.
+     */
+    private function generateUniqueLogin(string $base): string
+    {
+        $login = $base;
+        $counter = 1;
+        // Bunday login authorizations jadvalida mavjudligini tekshirish
+        while (Authorization::where('login', $login)->exists()) {
+            $login = $base . $counter;
+            $counter++;
+        }
+        return $login;
+    }
+
+    /**
+     * Formani tozalash
+     */
     private function resetForm()
     {
         // Barcha formalarni boshlang'ich holatga qaytarish
-        $this->form = array_fill_keys(array_keys($this->form), null);
-        $this->form['group_ids'] = []; // group_ids ni bo'sh array sifatida qayta o'rnatish
-        $this->study = [
-            'language' => [],
-            'course_id' => null,
-            'knowledge_level_id' => null,
-            'days' => [],
-        ];
-        $this->trial = array_fill_keys(array_keys($this->trial), null);
-        $this->parent = array_fill_keys(array_keys($this->parent), null);
+        $this->reset(
+            'form',
+            'study',
+            'trial',
+            'parent'
+        );
+        // group_ids ni alohida tozalash kerak, chunki u $form ichida
+        $this->form['group_ids'] = [];
     }
 
+    /**
+     * "Qo'shish" tugmasi uchun metod
+     */
     public function create()
     {
         $this->save(false);
     }
 
+    /**
+     * "Qo'shish & Yana Qo'shish" tugmasi uchun metod
+     */
     public function createAnother()
     {
         $this->save(true);

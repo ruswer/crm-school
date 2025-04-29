@@ -74,19 +74,33 @@
                                         @endif
                                     </div>
 
-                                    <!-- Qarz va Imtiyoz -->
+                                        {{-- Qarz va Imtiyoz --}}
                                     <div class="space-y-2">
+                                        {{-- Qarz (o'zgarishsiz) --}}
                                         <div class="flex items-center justify-between text-sm">
                                             <span class="text-gray-500">Qarz:</span>
                                             <span class="font-medium {{ ($group->pivot->debt ?? 0) > 0 ? 'text-red-600' : 'text-green-600' }}">
                                                 {{ number_format($group->pivot->debt ?? 0, 0, ',', ' ') }} so'm
                                             </span>
                                         </div>
+                                        {{-- Imtiyoz (o'zgartirilgan) --}}
                                         <div class="flex items-center justify-between text-sm">
                                             <span class="text-gray-500">Imtiyoz:</span>
-                                            <span class="font-medium text-gray-900">
-                                                {{ number_format($group->pivot->discount ?? 0, 0, ',', ' ') }} so'm
-                                            </span>
+                                            <div class="flex items-center space-x-2"> {{-- Summa va ikonkani yonma-yon joylash --}}
+                                                <span class="font-medium text-gray-900">
+                                                    {{ number_format($group->pivot->discount ?? 0, 0, ',', ' ') }} so'm
+                                                </span>
+                                                {{-- Imtiyoz qo'shish ikonka-tugmasi --}}
+                                                <button type="button"
+                                                        wire:click="openAddDiscountModal({{ $group->id }})" {{-- Modalni ochish uchun --}}
+                                                        class="text-blue-500 hover:text-blue-700 focus:outline-none p-1" {{-- Padding qo'shish mumkin --}}
+                                                        title="Imtiyoz qo'shish">
+                                                    {{-- Ikonka o'lchamini h-6 w-6 ga o'zgartirish --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -95,6 +109,106 @@
                     </dl>
                 </div>
             </div>
+        </div>
+        {{-- Imtiyoz Qo'shish Modali --}}
+        <div x-data="{ show: @entangle('showAddDiscountModal') }"
+            x-show="show"
+            x-on:keydown.escape.window="show = false"
+            style="display: none;"
+            class="fixed inset-0 z-50 overflow-y-auto" {{-- z-index ni balandroq qiling --}}
+            aria-labelledby="add-discount-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            {{-- Background overlay --}}
+            <div x-show="show"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" aria-hidden="true"
+                    @click="show = false"></div> {{-- Fonni bosganda yopish --}}
+
+            {{-- Modal panel --}}
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-show="show"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
+
+                <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900" id="add-discount-modal-title">
+                        Guruh uchun Imtiyoz Qo'shish
+                        ({{-- Guruh nomini ko'rsatish --}}
+                        @if($discountGroup)
+                            <span class="text-sm text-gray-500">{{ $discountGroup->name }}</span>
+                        @endif
+                        )
+                    </h3>
+                    <button type="button" @click="show = false" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="saveDiscount" class="mt-6 space-y-4">
+                    {{-- Ball kiritish maydoni --}}
+                    <div>
+                        <label for="discount_points" class="block text-sm font-medium text-gray-700">Imtiyoz Ballari</label>
+                        <input type="number" step="0.1" min="0" max="6"
+                               wire:model.live="discountPoints"
+                               id="discount_points"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('discountPoints') border-red-500 @enderror">
+                        @error('discountPoints') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Hisoblangan summa (dinamik) --}}
+                    <div class="p-3 bg-gray-50 rounded-md">
+                        <span class="text-sm font-medium text-gray-700">Hisoblangan Imtiyoz Summasi:</span>
+                        <span class="ml-2 text-sm font-semibold text-indigo-600">
+                            {{ number_format($calculatedDiscountAmount, 0, ',', ' ') }} so'm
+                        </span>
+                        <span class="text-xs text-gray-500"> (1 ball = {{ number_format($pointsDiscountRate, 0, ',', ' ') }} so'm)</span>
+                    </div>
+
+                    {{-- Tavsif kiritish maydoni --}}
+                    <div>
+                        <label for="discount_description" class="block text-sm font-medium text-gray-700">Tavsif (Ixtiyoriy)</label>
+                        <textarea wire:model.defer="discountDescription" id="discount_description" rows="3"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('discountDescription') border-red-500 @enderror"></textarea>
+                        @error('discountDescription') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Tugmalar --}}
+                    <div class="pt-5 mt-6 border-t border-gray-200 sm:flex sm:flex-row-reverse">
+                        <button type="submit"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-75 cursor-wait"
+                                class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                            <span wire:loading wire:target="saveDiscount" class="mr-2">
+                                <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">...</svg> {{-- Loading SVG --}}
+                            </span>
+                            <span wire:loading.remove wire:target="saveDiscount">
+                                Imtiyozni Qo'shish
+                            </span>
+                            <span wire:loading wire:target="saveDiscount">
+                                Saqlanmoqda...
+                            </span>
+                        </button>
+                        <button type="button" @click="show = false"
+                                wire:loading.attr="disabled"
+                                class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                            Bekor qilish
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
         </div>
 
         <!-- O'ng panel (70%) -->
@@ -176,8 +290,9 @@
                             </a>
 
                             <!-- Safdan chiqarish -->
-                            <button type="button" 
-                                class="px-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-white transition-all duration-200">
+                            <button type="button"
+                                wire:click="openRemoveStudentModal" {{-- Modalni ochish uchun wire:click qo'shildi --}}
+                                class="px-2 rounded-md text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"> {{-- Hover rangini qizilga o'zgartirdim --}}
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
                                 </svg>
@@ -206,4 +321,102 @@
             </div>
         </div>
     </div>
+    {{-- Safdan chiqarish Modali --}}
+    @if($showRemoveStudentModal)
+        <div class="fixed inset-0 z-[1999] overflow-y-auto" {{-- z-index ni Filamentnikidan balandroq qildim --}}
+            aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                {{-- Modal foni --}}
+                <div x-data
+                    x-show="$wire.showRemoveStudentModal"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+                    aria-hidden="true"
+                    @click="$wire.set('showRemoveStudentModal', false)"></div> {{-- Fonni bosganda yopish --}}
+
+                {{-- Modal kontenti --}}
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <div x-data
+                    x-show="$wire.showRemoveStudentModal"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+                    <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">
+                            Studentni Safdan Chiqarish
+                        </h3>
+                        <button type="button" @click="$wire.set('showRemoveStudentModal', false)" class="text-gray-400 hover:text-gray-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mt-6 space-y-4">
+                        <p class="text-sm text-gray-600">
+                            Haqiqatan ham **{{ $record->first_name }} {{ $record->last_name }}**ni safdan chiqarmoqchimisiz? Iltimos, sababini tanlang:
+                        </p>
+
+                        {{-- Sababni tanlash --}}
+                        <div>
+                            <label for="removal_reason_id" class="block text-sm font-medium text-gray-700 sr-only">
+                                Safdan chiqarish sababi
+                            </label>
+                            <select id="removal_reason_id"
+                                    wire:model.live="removalReasonId" {{-- removalReasonId ga bog'lash --}}
+                                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm @error('removalReasonId') border-red-500 @enderror">
+                                <option value="">Sababni tanlang...</option>
+                                {{-- removalReasonsOptions dan foydalanish --}}
+                                @foreach($removalReasonsOptions as $id => $name)
+                                    <option value="{{ $id }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                            {{-- Xatolikni removalReasonId uchun tekshirish --}}
+                            @error('removalReasonId')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="pt-5 mt-6 border-t border-gray-200 sm:flex sm:flex-row-reverse">
+                        <button type="button"
+                                wire:click="removeStudent"
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-75 cursor-wait"
+                                class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                            {{-- Loading ikonka va matn --}}
+                            <span wire:loading wire:target="removeStudent" class="mr-2">
+                                <svg class="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
+                            <span wire:loading.remove wire:target="removeStudent">
+                                Safdan Chiqarish
+                            </span>
+                            <span wire:loading wire:target="removeStudent">
+                                Bajarilmoqda...
+                            </span>
+                        </button>
+                        <button type="button"
+                                @click="$wire.set('showRemoveStudentModal', false)"
+                                wire:loading.attr="disabled" {{-- Yuklanayotganda bekor qilishni ham o'chirish --}}
+                                class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
+                            Bekor qilish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </x-filament::page>

@@ -1,188 +1,220 @@
 <x-filament::page>
-    <div class="flex flex-col h-full"">
-        <!-- To'lovlar ro'yxati -->
-        <div class="flex-1 bg-white rounded-md shadow-sm">
-            <!-- To'lovlarni qidirish -->
-            <div class="flex items-center justify-between p-4 rounded-md shadow-sm bg-white">
+    {{-- Bitta asosiy o'rab turuvchi div --}}
+    <div class="flex flex-col gap-6">
+
+        {{-- Filtrlar Bo'limi (Manual HTML) --}}
+        <div class="bg-white rounded-md shadow-sm dark:bg-gray-800">
+            {{-- Sarlavha --}}
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500 dark:text-gray-400">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                     </svg>
-                    <span class="text-xl font-semibold text-gray-800">Tanlash</span>
+                    <span class="text-xl font-semibold text-gray-800 dark:text-gray-200">Filtrlar</span>
                 </div>
+                {{-- Bu yerga boshqa tugmalar qo'shish mumkin --}}
             </div>
 
-            <!-- Qidiruv filtrlari -->
-            <div class="flex items-center justify-between bg-white p-4 rounded-md shadow-sm gap-4 flex-nowrap">
-                <!-- Chap tomon: Sana bo'yicha qidirish -->
-                <div class="flex flex-col gap-4 w-full lg:w-full lg:min-w-0">
-                    <!-- Tepa qator: Filial va Guruh select -->
-                    <div class="flex flex-wrap lg:flex-nowrap gap-4">
-                        <!-- Filial bo'yicha qidirish -->
-                        <div class="w-full sm:w-1/2 lg:flex-1">
-                            <label for="branch" class="block text-sm font-medium text-gray-700">Filial</label>
-                            <select id="branch" name="branch" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+            {{-- Filtr Inputlari --}}
+            <div class="p-4">
+                <div class="flex flex-col gap-4 w-full">
+                    {{-- Birinchi qator: Filial, Guruh, Oy, Yil --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {{-- Filial --}}
+                        <div>
+                            <label for="branch_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Filial</label>
+                            {{-- Filial o'zgarganda guruhlarni yangilash uchun .live --}}
+                            <select wire:model.live="selectedBranch" id="branch_filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Barcha filiallar</option>
-                                <option value="1">Filial 1</option>
-                                <option value="2">Filial 2</option>
+                                @foreach($branches as $branch)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <!-- Guruh bo'yicha qidirish -->
-                        <div class="w-full sm:w-1/2 lg:flex-1">
-                            <label for="group" class="block text-sm font-medium text-gray-700">Guruh</label>
-                            <select id="group" name="group" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        {{-- Guruh --}}
+                        <div>
+                            <label for="group_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Guruh</label>
+                            <select wire:model.defer="selectedGroup" id="group_filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" @if(empty($groups)) disabled @endif>
                                 <option value="">Barcha guruhlar</option>
-                                <option value="A">Guruh A</option>
-                                <option value="B">Guruh B</option>
+                                @foreach($groups as $group)
+                                    <option value="{{ $group->id }}">{{ $group->name }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <!-- Oy bo'yicha qidirish -->
-                        <div class="w-full sm:w-1/2 lg:flex-1">
-                            <label for="month" class="block text-sm font-medium text-gray-700">Oy</label>
-                            <select id="month" name="month" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        {{-- Oy (Hozircha filtr logikasida ishlatilmayapti) --}}
+                        <div>
+                            <label for="month_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Oy</label>
+                            <select wire:model.defer="selectedMonth" id="month_filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Barcha Oylar</option>
-                                <option value="11">Noyabr</option>
-                                <option value="12">Dekabr</option>
+                                @foreach($months as $monthNumber => $monthName)
+                                    <option value="{{ $monthNumber }}">{{ $monthName }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <!-- Yil bo'yicha qidirish -->
-                        <div class="w-full sm:w-1/2 lg:flex-1">
-                            <label for="year" class="block text-sm font-medium text-gray-700">Yil</label>
-                            <select id="year" name="year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        {{-- Yil (Hozircha filtr logikasida ishlatilmayapti) --}}
+                        <div>
+                            <label for="year_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Yil</label>
+                            <select wire:model.defer="selectedYear" id="year_filter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 <option value="">Barcha Yillar</option>
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
-                    <!-- Pastki qator: Qidirish tugmasi o'ngda -->
-                    <div class="flex justify-end">
-                        <button
-                            type="button"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto"
-                        >
-                            <svg class="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            Qidirish
-                        </button>
+
+                    {{-- Ikkinchi qator: Qidiruv va Tugma --}}
+                    <div class="flex justify-between items-end pt-4 gap-4"> {{-- Qidiruv va tugma bir qatorda --}}
+                        {{-- Qidiruv --}}
+                        <div class="flex-1"> {{-- Qidiruv maydoni --}}
+                            <label for="searchQuery" class="block text-sm font-medium text-gray-700">O'quvchi (Ism, Tel)</label>
+                            <input wire:model.defer="searchQuery" id="searchQuery" type="search" placeholder="Qidirish..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" />
+                        </div>
+
+                        {{-- Qidirish Tugmasi --}}
+                        <div class="flex justify-end"> {{-- Tugma oxirgi ustunda o'ngga suriladi --}}
+                            <button
+                                wire:click="filterDebtors" {{-- Filtr metodini chaqirish --}}
+                                type="button"
+                                wire:loading.attr="disabled"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto"
+                                >
+                                {{-- Loading ikonkasi --}}
+                                <svg wire:loading wire:target="filterDebtors" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{-- Qidiruv ikonkasi --}}
+                                <svg wire:loading.remove wire:target="filterDebtors" class="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Qidirish
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- To'lovlar jadvali -->
-        <div class="flex-1 mt-4 bg-white rounded-md shadow-sm p-4">
-            <!-- Table responsive wrapper -->
-            <div class="overflow-x-auto bg-white dark:bg-neutral-700">
-                <!-- Search input -->
-                <div class="relative m-[2px] mb-3 mr-5 float-left">
-                <label for="inputSearch" class="sr-only">Search </label>
-                <input id="inputSearch" type="text" placeholder="Search..." class="block w-64 rounded-lg border dark:border-none dark:bg-neutral-600 py-2 pl-10 pr-4 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400" />
-                <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-neutral-500 dark:text-neutral-200">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                </span>
-                </div>
-            
-                <!-- Table -->
+        {{-- Qarzdorlar Jadvali (Avvalgi javobdagi kabi qoladi) --}}
+        <x-filament::card>
+            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 py-4 border-b border-gray-200 dark:border-gray-700">
+                Qarzdorlar Ro'yxati
+            </h2>
+            <div class="overflow-x-auto">
                 <table class="min-w-full text-left text-sm whitespace-nowrap">
-                    <!-- Table head -->
-                    <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-gray-100 text-gray-800">
+                    {{-- Jadval Boshi --}}
+                    <thead class="uppercase tracking-wider border-b-2 dark:border-neutral-600 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                         <tr>
-                            @foreach ([
-                                'O\'quvchi' => 'name',
-                                'Davr' => 'period',
-                                'Narxi' => 'price',
-                                'Imtiyoz' => 'compage',
-                                'To\'langan' => 'paid',
-                                'Qarz' => 'debt',
-                            ] as $label => $column)
-                                <th scope="col" class="px-6 py-4">
-                                    {{ $label }}
-                                    <a href="#" wire:click="sort('{{ $column }}')" class="inline">
-                                        <svg xmlns="http://www.w3.org/2000/svg" 
-                                            viewBox="0 0 320 512" 
-                                            class="w-[0.75rem] h-[0.75rem] inline ml-1 text-neutral-500 dark:text-neutral-200 mb-[1px] 
-                                                    {{ isset($sortField) && $sortField === $column ? ($sortDirection === 'asc' ? 'rotate-180' : '') : '' }}"
-                                            fill="currentColor">
-                                            <path d="M137.4 41.4c12.5-12.5 32.8-12.5 45.3 0l128 128c9.2 9.2 11.9 22.9 6.9 34.9s-16.6 19.8-29.6 19.8H32c-12.9 0-24.6-7.8-29.6-19.8s-2.2-25.7 6.9-34.9l128-128z" />
-                                        </svg>
-                                    </a>
+                            {{-- Ustun nomlari va saralash --}}
+                            @php
+                                $columns = [
+                                    'O\'quvchi' => 'student_name',
+                                    'Guruh(lar)' => null,
+                                    'Qarz miqdori' => 'total_debt',
+                                    'Oxirgi to\'lov' => 'last_payment_date',
+                                    'To\'lov muddati' => 'next_due_date',
+                                ];
+                            @endphp
+
+                            @foreach ($columns as $label => $columnKey)
+                                <th scope="col" class="px-6 py-3">
+                                    @if($columnKey)
+                                        <button wire:click="sort('{{ $columnKey }}')" class="flex items-center gap-1 uppercase font-semibold">
+                                            <span>{{ $label }}</span>
+                                            @if($sortField === $columnKey || ($columnKey === 'student_name' && $sortField === 'first_name'))
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    @if($sortDirection === 'asc') <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /> @else <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /> @endif
+                                                </svg>
+                                            @else
+                                                 <svg class="w-3 h-3 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" /> </svg>
+                                            @endif
+                                        </button>
+                                    @else
+                                        <span class="uppercase font-semibold">{{ $label }}</span>
+                                    @endif
                                 </th>
                             @endforeach
-                            <th scope="col" class="px-6 py-4">Amallar</th> <!-- Yangi ustun -->
+                            <th scope="col" class="px-6 py-3 text-right uppercase font-semibold">Amallar</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border-b dark:border-neutral-600">
-                            <td class="px-6 py-4">
-                                <a href="#"
-                                    wire:click="showStudentProfile()"
-                                    class="text-primary-600 hover:text-primary-900 hover:underline">
-                                    Akbaraliyev Akbarbek
-                                </a>
-                            </td>
-                            <td class="px-6 py-4">01-02-2022 ~ 01-03-2022</td>
-                            <td class="px-6 py-4">600,000 UZS</td>
-                            <td class="px-6 py-4"></td>
-                            <td class="px-6 py-4">+20,000 UZS</td>
-                            <td class="px-6 py-4">-580,000 UZS</td>
-                            <td class="px-6 py-4">
-                                <a href="#" 
-                                wire:click="editStudent(1)" 
-                                class="text-blue-600 hover:text-blue-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" 
-                                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
-                                        stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" 
-                                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L9.38 17.273a4.5 4.5 0 01-1.897 1.13l-2.745.823.823-2.745a4.5 4.5 0 011.13-1.897l10.171-10.17z" />
-                                    </svg>
-                                </a>
-                            </td>
-                        </tr>
+                    {{-- Jadval Tanasi --}}
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @forelse ($debtors as $debtor)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                {{-- O'quvchi --}}
+                                <td class="px-6 py-4">
+                                    <a href="#"
+                                        wire:click="showStudentProfile({{ $debtor->id }})"
+                                        class="text-primary-600 hover:text-primary-900 hover:underline">
+                                        {{ $debtor->first_name }} {{ $debtor->last_name }}
+                                    </a>
+                                </td>
+                                {{-- Guruh(lar) --}}
+                                <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
+                                    {{ $debtor->groups->pluck('name')->implode(', ') ?: '-' }}
+                                </td>
+                                {{-- Qarz miqdori --}}
+                                <td class="px-6 py-4 font-semibold text-red-600 dark:text-red-500">
+                                    {{ number_format($debtor->total_debt ?? 0, 0, ',', ' ') }} UZS
+                                </td>
+                                {{-- Oxirgi to'lov sanasi --}}
+                                <td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+                                    {{ $debtor->last_payment_date ? \Carbon\Carbon::parse($debtor->last_payment_date)->format('d.m.Y') : '-' }}
+                                </td>
+                                {{-- To'lov muddati (eng yaqini) --}}
+                                <td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+                                    {{ $debtor->next_due_date ? \Carbon\Carbon::parse($debtor->next_due_date)->format('d.m.Y') : '-' }}
+                                </td>
+                                {{-- Amallar --}}
+                                <td class="px-6 py-4 text-right">
+                                    <x-filament::button
+                                        wire:click="sendReminder({{ $debtor->id }})"
+                                        color="warning"
+                                        size="sm"
+                                        icon="heroicon-o-bell-alert"
+                                        tooltip="Eslatma yuborish"
+                                    >
+                                        Eslatma
+                                    </x-filament::button>
+                                </td>
+                            </tr>
+                        @empty
+                            {{-- Ma'lumot topilmaganda --}}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="text-center py-12">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                        </svg>
+                                        <h3 class="mt-2 text-sm font-medium text-gray-900">Ma'lumot topilmadi</h3>
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Tanlangan filial yoki guruh bo'yicha ma'lumot topilmadi.
+                                        </p>
+                                        <div class="mt-6">
+                                            <button
+                                                wire:click="resetFilters"
+                                                type="button"
+                                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            >
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                                Filterni tozalash
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
-          
-                <nav class="mt-5 flex items-center justify-center text-sm" aria-label="Page navigation example">
-                    <ul class="list-style-none flex gap-1">
-                        <li>
-                            <a class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            href="#!">
-                                Previous
-                            </a>
-                        </li>
-                        <li>
-                            <a class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            href="#!">
-                                1
-                            </a>
-                        </li>
-                        <li aria-current="page">
-                            <a class="relative block rounded bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700 transition-all duration-300"
-                            href="#!">
-                                2
-                                <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            href="#!">
-                                3
-                            </a>
-                        </li>
-                        <li>
-                            <a class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            href="#!">
-                                Next
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
-        </div>
-    </div>
+            {{-- Pagination --}}
+            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                {{ $debtors->links() }}
+            </div>
+        </x-filament::card>
+
+    </div> {{-- Asosiy o'rab turuvchi div yopilishi --}}
 </x-filament::page>

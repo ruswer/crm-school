@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class MarketingSource extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'type',
-        'status'
+        'status',
+        'description',
     ];
 
     public function students()

@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'passport_number',
         'branch_id',
@@ -19,6 +23,7 @@ class Student extends Model
         'phone',
         'email',
         'status_id',
+        'points',
         'study_language',
         'knowledge_level_id',
         'study_days',
@@ -27,14 +32,17 @@ class Student extends Model
         'trial_teacher_id',
         'trial_called_at',
         'trial_attended_at',
+        'removal_reason_id',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
+        'points' => 'decimal:2',
         'trial_called_at' => 'datetime',
         'trial_attended_at' => 'datetime',
         'study_days' => 'array',
     ];
+    protected $dates = ['deleted_at'];
 
     // Relationships
     public function branch(): BelongsTo
@@ -96,6 +104,27 @@ class Student extends Model
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'student_groups')
+            ->withPivot('discount', 'debt') 
             ->withTimestamps();
+    }
+
+    public function authorization(): MorphOne 
+    {
+        return $this->morphOne(Authorization::class, 'authenticatable');
+    }
+
+    public function removalReason()
+    {
+        return $this->belongsTo(RemovalReason::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 }

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             StudentSettingsSeeder::class,
             InitialDataSeeder::class,
             GroupSeeder::class,
+            RemovalReasonSeeder::class,
         ]);
     }
 }

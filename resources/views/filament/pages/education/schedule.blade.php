@@ -1,78 +1,157 @@
 <x-filament::page>
-    <div class="flex flex-col h-full">
-        <!-- Tepa qism -->
-        <div class="flex-1 bg-white rounded-md shadow-sm">
-            <div class="flex items-center justify-between p-4 rounded-md shadow-sm bg-white">
-                <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+
+    {{-- Filtrlar paneli --}}
+    <div class="mb-2 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Tanlash</h3>
+            <x-filament::button
+                tag="a"
+                :href="route('filament.admin.pages.education.schedule.create')"
+                class="inline-flex items-center space-x-2"
+            >
+                <div class="flex items-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    <span class="text-xl font-semibold text-gray-800">Tanlash</span>
+                    <span class="ml-2">Dars Jadvali qo'shish/Yangilash</span>
                 </div>
-            
-                <!-- Qo'shish tugmasi -->
-                <button type="button" 
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </x-filament::button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {{-- Filial filtri --}}
+            <div>
+                <label for="branch_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Filial</label>
+                <select id="branch_filter" wire:model.defer="branch_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="">Barcha filiallar</option>
+                    @foreach($this->branchOptions as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Guruh filtri --}}
+            <div>
+                <label for="group_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Guruh</label>
+                <select id="group_filter" wire:model.defer="group_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        @disabled(!$this->branch_id)>
+                    <option value="">Barcha guruhlar</option>
+                     {{-- $this->groups o'rniga $this->groupOptions --}}
+                    @foreach($this->groupOptions as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- O'qituvchi filtri --}}
+            <div>
+                <label for="teacher_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300">O'qituvchi</label>
+                <select id="teacher_filter" wire:model.defer="teacher_id"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="">Barcha o'qituvchilar</option>
+                    @foreach($this->teacherOptions as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Agar "Qidirish" tugmasi kerak bo'lsa --}}
+            <div class="md:col-span-3 flex justify-end">
+                <button
+                    type="button"
+                    wire:click="searchSchedule"
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-auto" {{-- w-full olib tashlandi --}}
+                >
+                    <svg wire:loading wire:target="applyFilters" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Qo'shish
+                    <svg wire:loading.remove wire:target="applyFilters" class="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Qidirish
                 </button>
             </div>
+        </div>
+    </div>
 
-            <!-- Pastki qism:qidirish -->
-            <div class="flex items-center justify-between bg-white p-4 rounded-md shadow-sm gap-4 flex-nowrap">
-                <div class="flex flex-col gap-4 w-full">
-                    <!-- Tepa qator: Filial va Guruh select -->
-                    <div class="flex flex-wrap lg:flex-nowrap gap-4">
-                        <!-- Filial bo'yicha qidirish -->
-                        <div class="w-full lg:w-1/3">
-                            <label for="branch" class="block text-sm font-medium text-gray-700">Filial</label>
-                            <select id="branch" name="branch" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <option value="">Barcha filiallar</option>
-                                <option value="1">Filial 1</option>
-                                <option value="2">Filial 2</option>
-                            </select>
-                        </div>
-                        <!-- Guruh bo'yicha qidirish -->
-                        <div class="w-full lg:w-1/3">
-                            <label for="group" class="block text-sm font-medium text-gray-700">Guruh</label>
-                            <select id="group" name="group" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <option value="">Barcha guruhlar</option>
-                                <option value="A">Guruh A</option>
-                                <option value="B">Guruh B</option>
-                            </select>
-                        </div>
-                        <!-- O'qituvchi bo'yicha qidirish -->
-                        <div class="w-full lg:w-1/3">
-                            <label for="teacher" class="block text-sm font-medium text-gray-700">O'qituvchi</label>
-                            <select id="teacher" name="teacher" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <option value="">Barcha o'qituvchilar</option>
-                                <option value="1">O'qituvchi 1</option>
-                                <option value="2">O'qituvchi 2</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- Pastki qator: Qidirish tugmasi o'ngda -->
-                    <div class="flex justify-end">
-                        <button
-                            type="button"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto"
-                        >
-                            <svg class="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            Qidirish
-                        </button>
-                    </div>
-                </div>
+    {{-- Umumiy konteyner --}}
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        {{-- Sarlavha va kabinetlar qismi --}}
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Kabinetlar bo'yicha dars jadvallari
+            </h2>
+            
+            {{-- Kabinetlar ro'yxati --}}
+            <div class="flex flex-wrap gap-2">
+                @foreach($this->getCabinets() as $cabinet)
+                    <button
+                        wire:click="filterByRoom({{ $cabinet->id }})"
+                        wire:loading.attr="disabled"
+                        @class([
+                            'px-4 py-4 text-sm font-medium rounded-md transition-colors',
+                            'bg-primary-600 text-white hover:bg-primary-500' => $this->selectedCabinetId === $cabinet->id,
+                            'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600' => $this->selectedCabinetId !== $cabinet->id,
+                        ])
+                    >
+                        {{ $cabinet->name }}
+                        @if($this->getScheduleCountForCabinet($cabinet->id))
+                            <span class="ml-2 px-2 py-1 text-xs rounded-full bg-white text-primary-600">
+                                {{ $this->getScheduleCountForCabinet($cabinet->id) }}
+                            </span>
+                        @endif
+                    </button>
+                @endforeach
             </div>
         </div>
 
-        <!-- Pastki qism: Kontent -->
-        <div class="flex-1 mt-4 bg-white rounded-md shadow-sm p-4">
-            <h2 class="text-lg font-bold text-gray-800 mb-4 py-4 border-b border-gray-200">Darslar jadvali</h2>
-            
+        {{-- Dars jadvali --}}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                {{-- Jadval sarlavhasi --}}
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-20">
+                            Vaqt
+                        </th>
+                        @foreach($this->getWeekDays() as $day)
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                {{ $day['short'] }} <br>
+                                <span class="text-xs">{{ $day['date'] }}</span>
+                            </th>
+                        @endforeach
+                    </tr>
+                </thead>
+                {{-- Jadval tanasi --}}
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach($this->getTimeSlots() as $time)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                {{ $time }}
+                            </td>
+                            @foreach($this->getWeekDays() as $day)
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                                    @if($schedule = $this->getScheduleForTimeAndDay($time, $day['dayNum']))
+                                        <div class="p-2 bg-blue-50 dark:bg-blue-900/50 rounded">
+                                            <div class="font-medium">{{ $schedule->group?->name }}</div>
+                                            <div class="text-xs">{{ $schedule->teacher?->full_name }}</div>
+                                            <div class="text-xs">{{ $schedule->cabinet?->name }}</div>
+                                        </div>
+                                    @endif
+                                </td>
+                            @endforeach
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
+
+    {{-- Keyinchalik Qo'shish/Tahrirlash/O'chirish modallari uchun joy --}}
+    {{-- @if($showCreateModal) ... @endif --}}
+    {{-- @if($showEditModal) ... @endif --}}
+    {{-- @if($showDeleteModal) ... @endif --}}
+
 </x-filament::page>

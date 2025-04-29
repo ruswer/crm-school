@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Pages\Students\StudentProfilePage;
 use App\Models\Branch;
 use App\Models\Group;
 use App\Models\Student;
@@ -68,13 +69,7 @@ class Parents extends Page
     // Student profilini ko'rish uchun
     public function showStudentProfile($studentId)
     {
-        return redirect()->route('filament.admin.pages.students.student-profile', ['record' => $studentId]);
-    }
-
-    // Studentni tahrirlash uchun
-    public function editStudent($studentId)
-    {
-        return redirect()->route('filament.admin.pages.students.edit', ['record' => $studentId]);
+        return redirect(StudentProfilePage::getUrl(['record' => $studentId]));
     }
 
     // Saralash uchun
