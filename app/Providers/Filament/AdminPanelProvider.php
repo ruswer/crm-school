@@ -77,6 +77,14 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\Education\LessonSchedule::class,
                 \App\Filament\Pages\Education\CreateSchedulePage::class,
 
+                //HR bo'limi
+                \App\Filament\Pages\HR\Employees::class,
+                // \App\Filament\Pages\HR\EmployeeProfilePage::class,
+                \App\Filament\Pages\HR\DepartmentPage::class,
+                \App\Filament\Pages\HR\Attendance::class,
+                \App\Filament\Pages\HR\AttendanceReport::class,
+                \App\Filament\Pages\HR\PositionPage::class,
+                \App\Filament\Pages\HR\Salary::class,
                 ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
