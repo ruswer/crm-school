@@ -17,7 +17,6 @@ class Cabinets extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms; // Traitlarni qo'shish
 
-    protected static ?string $navigationIcon = 'heroicon-o-home';
     protected static ?string $navigationGroup = 'Ta\'lim';
     protected static ?string $title = 'Kabinetlar';
     protected static ?string $slug = 'education/cabinets';

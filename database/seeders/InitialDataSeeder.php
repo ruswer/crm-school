@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Branch;
 use App\Models\Course;
 use App\Models\Staff;
+use App\Models\Position;
 use App\Models\MarketingSource;
 
 class InitialDataSeeder extends Seeder
@@ -31,17 +32,28 @@ class InitialDataSeeder extends Seeder
             Course::create($course);
         }
 
+        // O'qituvchi pozitsiyalari
+        $positions = [
+            "Senior o'qituvchi" => Position::firstOrCreate(['name' => "Senior o'qituvchi"]),
+            "O'qituvchi" => Position::firstOrCreate(['name' => "O'qituvchi"]),
+        ];
+
         // O'qituvchilar
         $teachers = [
-            ['first_name' => 'Alisher', 'last_name' => 'Kadirov', 'position' => 'Senior o\'qituvchi', 'status' => 'active'],
-            ['first_name' => 'Jasur', 'last_name' => 'Karimov', 'position' => 'O\'qituvchi', 'status' => 'active'],
-            ['first_name' => 'Nozim', 'last_name' => 'Egamov', 'position' => 'O\'qituvchi', 'status' => 'active'],
-            ['first_name' => 'Shahlo', 'last_name' => 'Zokirova', 'position' => 'O\'qituvchi', 'status' => 'active'],
-            ['first_name' => 'Malika', 'last_name' => 'Nosirova', 'position' => 'O\'qituvchi', 'status' => 'active'],
+            ['first_name' => 'Alisher', 'last_name' => 'Kadirov', 'position' => "Senior o'qituvchi", 'status' => 'active'],
+            ['first_name' => 'Jasur', 'last_name' => 'Karimov', 'position' => "O'qituvchi", 'status' => 'active'],
+            ['first_name' => 'Nozim', 'last_name' => 'Egamov', 'position' => "O'qituvchi", 'status' => 'active'],
+            ['first_name' => 'Shahlo', 'last_name' => 'Zokirova', 'position' => "O'qituvchi", 'status' => 'active'],
+            ['first_name' => 'Malika', 'last_name' => 'Nosirova', 'position' => "O'qituvchi", 'status' => 'active'],
         ];
 
         foreach ($teachers as $teacher) {
-            Staff::create($teacher);
+            Staff::create([
+                'first_name' => $teacher['first_name'],
+                'last_name' => $teacher['last_name'],
+                'position_id' => $positions[$teacher['position']]->id,
+                'status' => $teacher['status'],
+            ]);
         }
 
         // Marketing manbalari

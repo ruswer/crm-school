@@ -15,8 +15,6 @@ class BillingSettingsPage extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    // --- Navigatsiya va Sahifa Sozlamalari (o'zgarishsiz) ---
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationGroup = 'Tizimni sozlash';
     protected static ?string $navigationLabel = 'Billing Sozlamalari';
     protected static ?string $title = 'Billing Sozlamalari';

@@ -19,7 +19,6 @@ class KnowledgeLevels extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms; // Traitlarni qo'shish
 
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $navigationGroup = 'Ta\'lim';
     protected static ?string $title = 'Bilim darajasi';
     protected static ?string $slug = 'education/knowledge-levels';

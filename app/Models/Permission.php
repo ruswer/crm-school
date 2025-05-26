@@ -8,13 +8,14 @@ class Permission extends Model
 {
     protected $fillable = [
         'name',
+        'guard_name', // Spatie uchun zarur
         'slug',
         'description',
-        'group'
+        'group',
     ];
-
+    
     public function roles()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class, 'role_permission', 'permission_id', 'role_id');
     }
 }

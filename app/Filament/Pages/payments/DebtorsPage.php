@@ -23,7 +23,6 @@ class DebtorsPage extends Page // HasForms olib tashlandi
     // use InteractsWithForms; // Olib tashlandi
     use WithPagination;
 
-    protected static ?string $navigationIcon = 'heroicon-o-exclamation-circle';
     protected static ?string $navigationGroup = 'To\'lovlar';
     protected static ?string $navigationLabel = 'Qarzdorlar';
     protected static ?string $title = 'Qarzdorlar';

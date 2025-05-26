@@ -37,7 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->brandName('CRM')
+            ->brandName('DoRus-CRM')
             ->darkMode(false)
             ->sidebarWidth('300px')
             ->maxContentWidth('1200px')
@@ -51,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\AuthorizationInfo::class,
                 \App\Filament\Pages\DeletedStudents::class,
                 \App\Filament\Pages\Students\StudentProfilePage::class,
+                \App\Filament\Pages\Students\ImportStudents::class,
                 
                 // To'lovlar bo'limi
                 \App\Filament\Pages\PaymentPage::class,
@@ -79,12 +80,19 @@ class AdminPanelProvider extends PanelProvider
 
                 //HR bo'limi
                 \App\Filament\Pages\HR\Employees::class,
-                // \App\Filament\Pages\HR\EmployeeProfilePage::class,
+                \App\Filament\Pages\HR\EmployeeProfilePage::class,
                 \App\Filament\Pages\HR\DepartmentPage::class,
                 \App\Filament\Pages\HR\Attendance::class,
                 \App\Filament\Pages\HR\AttendanceReport::class,
                 \App\Filament\Pages\HR\PositionPage::class,
                 \App\Filament\Pages\HR\Salary::class,
+
+                //Sozlamalar bo'limi
+
+                \App\Filament\Pages\Settings\SettingPage::class,
+                \App\Filament\Pages\Settings\BillingSettingsPage::class,
+                \App\Filament\Pages\Settings\RolesPermissions::class,
+                \App\Filament\Pages\Settings\AssignPermissions::class,
                 ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

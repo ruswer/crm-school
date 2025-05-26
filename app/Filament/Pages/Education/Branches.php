@@ -18,7 +18,6 @@ class Branches extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office';
     protected static ?string $navigationGroup = 'Ta\'lim';
     protected static ?string $title = 'Filiallar';
     protected static ?string $slug = 'education/branches';

@@ -16,7 +16,6 @@ class AddExpensePage extends Page
 {
     use WithPagination; // Pagination trait qo'shildi
 
-    protected static ?string $navigationIcon = 'heroicon-o-plus-circle';
     protected static ?string $navigationGroup = 'Chiqimlar';
     protected static ?string $navigationLabel = 'Chiqim qo\'shish';
     protected static ?string $title = 'Chiqimlar';

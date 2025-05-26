@@ -26,7 +26,6 @@ class PaymentPage extends Page
     use WithPagination;
 
     // Navigatsiya sozlamalari
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
     protected static ?string $navigationGroup = 'To\'lovlar';
     protected static ?string $navigationLabel = 'To\'lovlar Ro\'yxati';
     protected static ?string $title = 'To\'lovlar Ro\'yxati';

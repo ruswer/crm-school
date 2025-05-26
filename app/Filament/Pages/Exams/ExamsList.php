@@ -26,7 +26,6 @@ class ExamsList extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationGroup = 'Imtihonlar';
     protected static ?string $navigationLabel = 'Imtihonlar ro\'yxati';
     protected static ?string $title = 'Imtihonlar ro\'yxati';

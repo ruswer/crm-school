@@ -6,63 +6,57 @@ use App\Models\Staff;
 use App\Models\Branch;
 use App\Models\Role;
 use App\Models\Department;
-use App\Models\Position; // Position modelini import qilish
+use App\Models\Position;
 use Filament\Pages\Page;
-use App\Filament\Pages\HR\EmployeeProfilePage; // Profil sahifasini import qilish
+// EmployeeProfilePage importi agar ishlatilsa kerak bo'ladi, hozircha kommentariyada
+// use App\Filament\Pages\HR\EmployeeProfilePage;
 use Filament\Notifications\Notification;
-use Illuminate\Contracts\View\View; // View import qilish
+use Illuminate\Contracts\Pagination\LengthAwarePaginator; // To'g'ri interfeysni import qilish
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Livewire\WithPagination; // Pagination uchun
+use Livewire\WithPagination; // Pagination uchun trait
 
 class Employees extends Page
 {
-    use WithPagination; // Pagination traitini qo'shish
+    use WithPagination; // Pagination trait'ini ishlatish
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    public Staff $staff;
+
+    //<editor-fold desc="Filament Page Configuration">
     protected static ?string $navigationGroup = 'Kadrlar Bo\'limi';
     protected static ?string $navigationLabel = 'Xodimlar';
     protected static ?string $title = 'Xodimlar ro\'yxati';
     protected static ?string $slug = 'hr/employees';
     protected static ?int $navigationSort = 18;
+    
     protected static string $view = 'filament.pages.h-r.employees';
+    //</editor-fold>
 
-    // Filter properties
-    public $search = '';
-    public $branchFilter = null;
-    public $roleFilter = null; // Bu Role uchun qoladi
-    public $departmentFilter = null;
-    public $positionFilter = null; // <<< Position uchun filtr qo'shildi
+    //<editor-fold desc="Component Properties">
+    // Filterlash uchun xususiyatlar
+    public string $search = '';
+    public ?string $branchFilter = null;
+    public ?string $roleFilter = null;
+    public ?string $departmentFilter = null;
+    public ?string $positionFilter = null;
 
-    // Sort properties
-    public $sortField = 'first_name';
-    public $sortDirection = 'asc';
+    public string $sortField = 'first_name';
+    public string $sortDirection = 'asc';
 
-    // --- O'chirish uchun Modal Xususiyatlari ---
     public bool $showDeleteConfirmModal = false;
     public ?int $staffToDeleteId = null;
     public ?string $staffToDeleteName = null;
 
-    // Pagination
-    public $perPage = 10;
+    public int $perPage = 10;
+    public string $displayMode = 'grid';
+    //</editor-fold>
 
-    // Livewire lifecycle hook for pagination theme
-    public function boot(): void
+    public function toggleView(string $mode): void
     {
-        LengthAwarePaginator::useBootstrapFive(); // Yoki useTailwind()
+        $this->displayMode = $mode;
     }
 
-    public function goToStaffProfile($staffId)
-    {
-        // EmployeeProfilePage uchun marshrut nomini ishlatish
-        // Yoki EmployeeProfilePage::getUrl() ni ishlatish mumkin, lekin marshrut nomi yaxshiroq
-        return redirect()->to(EmployeeProfilePage::getUrl(['staff' => $staffId]));
-        // Yoki marshrut nomi bilan:
-        // return redirect()->route('filament.admin.pages.hr.employee-profile-page', ['staff' => $staffId]); // Marshrut nomini to'g'ri yozing
-    }
-
-    // Filter options
+    //<editor-fold desc="Computed Properties for Filters">
     public function getBranchesProperty(): Collection
     {
         return Branch::query()
@@ -70,10 +64,9 @@ class Employees extends Page
             ->pluck('name', 'id');
     }
 
-    // getRolesProperty endi Role modelidan ma'lumot oladi
     public function getRolesProperty(): Collection
     {
-        return Role::query() // <<< Role modeliga o'zgartirildi
+        return Role::query()
             ->orderBy('name')
             ->pluck('name', 'id');
     }
@@ -85,47 +78,69 @@ class Employees extends Page
             ->pluck('name', 'id');
     }
 
-    // Position uchun yangi computed property
-    public function getPositionsProperty(): Collection // <<< YANGI METOD QO'SHILDI
+    public function getPositionsProperty(): Collection
     {
+        if (!$this->branchFilter) {
+            return collect();
+        }
+
+        $positionIdsInBranch = Staff::query()
+            ->where('branch_id', $this->branchFilter)
+            ->whereNotNull('position_id')
+            ->distinct()
+            ->pluck('position_id');
+
+        if ($positionIdsInBranch->isEmpty()) {
+            return collect();
+        }
+
         return Position::query()
+            ->whereIn('id', $positionIdsInBranch)
             ->orderBy('name')
             ->pluck('name', 'id');
     }
+    //</editor-fold>
 
-    // Staff list with filters
-    // Computed property sifatida qayta yozish yaxshiroq
     public function getStaffListProperty(): LengthAwarePaginator
     {
+        // Bu metod o'zgarishsiz qoladi, chunki u joriy filter qiymatlariga asoslanadi
         return Staff::query()
-            ->with(['branch', 'role', 'department', 'position']) // Aloqalarni yuklash
+            ->with(['branch', 'role', 'department', 'position'])
             ->when($this->search, function (Builder $query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%")
-                      // ID, telefon, rol, lavozim bo'yicha qidirishni ham qo'shish mumkin
-                      ->orWhere('id', $search)
-                      ->orWhere('phone', 'like', "%{$search}%")
-                      ->orWhereHas('role', fn($roleQuery) => $roleQuery->where('name', 'like', "%{$search}%"))
-                      ->orWhereHas('position', fn($posQuery) => $posQuery->where('name', 'like', "%{$search}%"));
+                 $query->where(function (Builder $q) use ($search) {
+                    $searchTerm = '%' . $search . '%';
+                    $q->where('first_name', 'like', $searchTerm)
+                      ->orWhere('last_name', 'like', $searchTerm)
+                      ->orWhere('email', 'like', $searchTerm)
+                      ->orWhere('phone', 'like', $searchTerm)
+                      ->when(is_numeric($search), fn($numQ) => $numQ->orWhere('id', (int)$search))
+                      ->orWhereHas('role', fn($roleQuery) => $roleQuery->where('name', 'like', $searchTerm))
+                      ->orWhereHas('position', fn($posQuery) => $posQuery->where('name', 'like', $searchTerm))
+                      ->orWhereHas('branch', fn($branchQuery) => $branchQuery->where('name', 'like', $searchTerm));
                 });
             })
-            ->when($this->branchFilter, fn ($q) => $q->where('branch_id', $this->branchFilter))
-            ->when($this->roleFilter, fn ($q) => $q->where('role_id', $this->roleFilter)) // Role bo'yicha filtr
-            ->when($this->departmentFilter, fn ($q) => $q->where('department_id', $this->departmentFilter)) // Department bo'yicha filtr (agar kerak bo'lsa)
-            ->when($this->positionFilter, fn ($q) => $q->where('position_id', $this->positionFilter)) // Position bo'yicha filtr
+            ->when($this->branchFilter, fn (Builder $q) => $q->where('branch_id', $this->branchFilter))
+            ->when($this->roleFilter, fn (Builder $q) => $q->where('role_id', $this->roleFilter))
+            ->when($this->departmentFilter, fn (Builder $q) => $q->where('department_id', $this->departmentFilter))
+            ->when($this->positionFilter, fn (Builder $q) => $q->where('position_id', $this->positionFilter)) // Bu shart endi search bosilganda ishlaydi
             ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage, ['*'], 'employeesPage'); // Pagination uchun pageName
+            ->paginate($this->perPage, ['*'], 'employeesPage');
     }
 
-    // "Qidirish" tugmasi bosilganda ishlaydi (defer modellari uchun)
+    //<editor-fold desc="Action Methods">
+
+    /**
+     * "Qidirish" tugmasi bosilganda filtrlar qo'llaniladi va sahifa reset qilinadi.
+     */
     public function search(): void
     {
-        $this->resetPage('employeesPage'); // Paginationni reset qilish
+        // Filtrlar allaqachon $this xususiyatlarida saqlangan (wire:model.defer tufayli).
+        // getStaffListProperty ularni avtomatik ravishda ishlatadi.
+        // Faqat paginationni reset qilish kerak.
+        $this->resetPage('employeesPage');
     }
 
-    public function sortBy($field): void
+    public function sortBy(string $field): void
     {
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -133,69 +148,69 @@ class Employees extends Page
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
-        $this->resetPage('employeesPage'); // Saralash o'zgarganda reset qilish
+        $this->resetPage('employeesPage');
     }
 
-    /**
-     * O'chirishni tasdiqlash modalini ochadi
-     */
-    public function confirmDeleteStaff(int $staffId, string $staffName): void // <<< YANGI METOD
+    // ... (confirmDeleteStaff, cancelDeleteStaff, deleteStaff, toggleView metodlari o'zgarishsiz) ...
+    public function confirmDeleteStaff(int $staffId, string $staffName): void
     {
         $this->staffToDeleteId = $staffId;
         $this->staffToDeleteName = $staffName;
         $this->showDeleteConfirmModal = true;
     }
 
-    /**
-     * Xodimni safdan chiqarish (Soft Delete)
-     */
-    public function deleteStaff(): void // <<< Argument olib tashlandi
+    public function cancelDeleteStaff(): void
     {
-        if (!$this->staffToDeleteId) {
-             // Agar ID topilmasa (xatolikni oldini olish)
-             $this->showDeleteConfirmModal = false; // Modalni yopish
-             return;
-        }
-
-        $staff = Staff::find($this->staffToDeleteId);
-        if ($staff) {
-            $staff->delete(); // Soft delete
-            Notification::make()
-                ->title('Muvaffaqiyatli')
-                ->body($this->staffToDeleteName . ' muvaffaqiyatli safdan chiqarildi.')
-                ->success()
-                ->send();
-        } else {
-            Notification::make()
-                ->title('Xatolik')
-                ->body('Xodim topilmadi.')
-                ->danger()
-                ->send();
-        }
-
-        // Modalni yopish va ID ni tozalash
-        $this->showDeleteConfirmModal = false;
-        $this->staffToDeleteId = null;
-        $this->staffToDeleteName = null;
+        $this->reset(['showDeleteConfirmModal', 'staffToDeleteId', 'staffToDeleteName']);
     }
 
-    // wire:model.live ishlatilsa, bu metodlar kerak emas, chunki Livewire avtomatik yangilaydi
-    // Agar wire:model.defer ishlatilsa, bu metodlar ham kerak emas, faqat search() metodi ishlaydi
+    public function deleteStaff(): void
+    {
+         if ($this->staffToDeleteId) {
+            try {
+                $staff = Staff::findOrFail($this->staffToDeleteId);
+                $staffName = $this->staffToDeleteName;
+                $staff->delete();
 
-    // Agar wire:model.live ishlatilsa, bu metodlar kerak bo'ladi:
-    public function updatedSearch(): void { $this->resetPage('employeesPage'); }
+                Notification::make()
+                    ->success()
+                    ->title("'$staffName' muvaffaqiyatli o'chirildi")
+                    ->send();
+
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                Notification::make()
+                    ->warning()
+                    ->title('Xodim topilmadi yoki allaqachon o\'chirilgan')
+                    ->send();
+            } catch (\Exception $e) {
+                 Notification::make()
+                    ->danger()
+                    ->title('Xodimni o\'chirishda xatolik yuz berdi')
+                    // ->body($e->getMessage()) // Development uchun
+                    ->send();
+            }
+        }
+        $this->cancelDeleteStaff();
+    }
+
+    public function showEmployeeProfile($staffId)
+    {
+        return redirect()->to(\App\Filament\Pages\HR\EmployeeProfilePage::getUrl(['staff' => $staffId]));
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Livewire Lifecycle Hooks">
+    // Sahifa soni o'zgarganda reset qilish qoladi
     public function updatedPerPage(): void { $this->resetPage('employeesPage'); }
-    public function updatedBranchFilter(): void { $this->resetPage('employeesPage'); }
-    public function updatedRoleFilter(): void { $this->resetPage('employeesPage'); }
-    public function updatedDepartmentFilter(): void { $this->resetPage('employeesPage'); }
-    public function updatedPositionFilter(): void { $this->resetPage('employeesPage'); } // <<< Position uchun qo'shildi
 
-    // Render method (Filament Page uchun odatda kerak emas, lekin custom logikada kerak bo'lishi mumkin)
-    // Agar render() metodini ishlatsangiz, layoutni ko'rsatishni unutmang
-    // public function render(): View
-    // {
-    //     return view(static::$view, [
-    //         'staffList' => $this->staffList, // Computed propertyni uzatish
-    //     ])->layout('filament-panels::components.layout.index');
-    // }
+    /**
+     * Filial filtri o'zgarganda faqat lavozim filtrini reset qilish.
+     * Sahifani reset QILMAYDI.
+     */
+    public function updatedBranchFilter(): void
+    {
+        $this->reset('positionFilter'); // Lavozim filtrini tozalash
+        // $this->resetPage('employeesPage'); // BU QATOR OLIB TASHLANDI
+    }
+
 }

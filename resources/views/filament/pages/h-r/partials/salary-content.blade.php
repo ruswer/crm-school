@@ -1,0 +1,2 @@
+{{-- TODO: Bu yerga xodimning ish haqi tarixi yoki hisob-kitoblari uchun komponent yoki HTML qo'shiladi --}}
+<p class="text-gray-500 dark:text-gray-400">Ish haqi ma'lumotlari shu yerda ko'rsatiladi.</p>

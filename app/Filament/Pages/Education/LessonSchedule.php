@@ -22,7 +22,6 @@ class LessonSchedule extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms; // Traitlarni qo'shish
 
-    protected static ?string $navigationIcon = 'heroicon-o-calendar';
     protected static ?string $navigationGroup = 'Ta\'lim';
     protected static ?string $navigationLabel = 'Darslar jadvali';
     protected static ?string $title = 'Darslar jadvali';

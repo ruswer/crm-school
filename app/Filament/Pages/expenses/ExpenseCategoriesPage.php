@@ -14,7 +14,6 @@ class ExpenseCategoriesPage extends Page
 {
     use WithPagination; // Pagination trait qo'shildi
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationGroup = 'Chiqimlar';
     protected static ?string $navigationLabel = 'Kategoriyalar';
     protected static ?string $title = 'Chiqimlar Kategoriyalari';

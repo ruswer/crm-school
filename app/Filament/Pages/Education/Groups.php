@@ -32,7 +32,6 @@ class Groups extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Ta\'lim';
     protected static ?string $title = 'Guruhlar';
     protected static ?string $slug = 'education/groups';

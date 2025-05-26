@@ -19,7 +19,6 @@ class Courses extends Page implements HasForms
 {
     use WithPagination, InteractsWithForms; // Traitlarni qo'shish
 
-    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationGroup = 'Ta\'lim';
     protected static ?string $title = 'Kurslar';
     protected static ?string $slug = 'education/courses';

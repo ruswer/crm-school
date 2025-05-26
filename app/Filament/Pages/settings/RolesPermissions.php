@@ -2,45 +2,56 @@
 
 namespace App\Filament\Pages\Settings;
 
-use Filament\Pages\Page;
 use App\Models\Role;
 use App\Models\Permission;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Checkbox;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BooleanColumn;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Url;
 
 class RolesPermissions extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-key';
-    
     protected static ?string $navigationGroup = 'Tizimni sozlash';
-
     protected static ?string $navigationLabel = 'Rollar va ruxsatlar';
-
     protected static ?string $title = 'Rollar va ruxsatlar';
-
+    protected static ?string $slug = 'roles-permissions';
     protected static ?int $navigationSort = 25;
 
     protected static string $view = 'filament.pages.settings.roles-permissions';
 
-    public $selectedRole = null;
+    public $roleName = '';
     public $permissions = [];
-    public $roleName;
-    public $roleDescription;
+    public $editName = '';
+    public $selectedPermissions = [];
+    public $roleToDeleteName = '';
+    public $modalType = '';
+    public $selectedRoleId = null;
+    public bool $showModal = false;
 
-    public function mount()
+    #[Url]
+    public $search = '';
+
+    #[Url]
+    public $sortField = 'name';
+
+    #[Url]
+    public $sortDirection = 'asc';
+
+    public function mount(): void
     {
         $this->permissions = Permission::all()
+            ->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'description' => $permission->description,
+                ];
+            })
             ->groupBy('group')
             ->toArray();
     }
@@ -48,102 +59,125 @@ class RolesPermissions extends Page implements HasForms
     protected function getFormSchema(): array
     {
         return [
-            Card::make()
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            Select::make('selectedRole')
-                                ->label('Rolni tanlang')
-                                ->options(Role::pluck('name', 'id'))
-                                ->reactive()
-                                ->afterStateUpdated(fn ($state) => $this->loadRolePermissions($state)),
-
-                            TextInput::make('roleName')
-                                ->label('Yangi rol nomi')
-                                ->placeholder('Rol nomini kiriting'),
-                        ]),
-
-                    TextInput::make('roleDescription')
-                        ->label('Rol tavsifi')
-                        ->placeholder('Rol haqida qisqacha ma\'lumot')
-                ]),
-
-            Section::make('Ruxsatlar')
-                ->schema([
-                    // Ruxsatlar guruhlar bo'yicha
-                    ...collect($this->permissions)->map(function ($items, $group) {
-                        return Section::make(Str::title($group))
-                            ->schema(
-                                collect($items)->map(function ($permission) {
-                                    return Checkbox::make("permissions.{$permission['id']}")
-                                        ->label($permission['name'])
-                                        ->helperText($permission['description'] ?? '')
-                                        ->inline();
-                                })->toArray()
-                            )
-                            ->columns(3);
-                    })->toArray(),
-                ]),
+            TextInput::make('roleName')
+                ->label('Rol nomi')
+                ->required()
+                ->maxLength(255)
+                ->placeholder('Rol nomini kiriting'),
         ];
     }
 
-    public function loadRolePermissions($roleId)
+    public function getRolesProperty()
     {
-        if (!$roleId) return;
-
-        $role = Role::with('permissions')->find($roleId);
-        if (!$role) return;
-
-        $this->roleName = $role->name;
-        $this->roleDescription = $role->description;
-        
-        // Ruxsatlarni belgilash
-        $this->permissions = Permission::all()
-            ->map(function ($permission) use ($role) {
-                return [
-                    'id' => $permission->id,
-                    'name' => $permission->name,
-                    'description' => $permission->description,
-                    'checked' => $role->permissions->contains($permission->id),
-                ];
-            })
-            ->groupBy('group')
-            ->toArray();
+        return Role::query()
+            ->when($this->search, fn ($query) => $query->where('name', 'like', '%' . $this->search . '%'))
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
     }
 
-    public function saveRole()
+    public function sortBy($field): void
     {
-        // Rol yaratish yoki yangilash
-        $role = $this->selectedRole 
-            ? Role::find($this->selectedRole)
-            : new Role();
-
-        $role->name = $this->roleName;
-        $role->description = $this->roleDescription;
-        $role->slug = Str::slug($this->roleName);
-        $role->save();
-
-        // Ruxsatlarni saqlash
-        $selectedPermissions = collect($this->permissions)
-            ->flatten(1)
-            ->where('checked', true)
-            ->pluck('id')
-            ->toArray();
-
-        $role->permissions()->sync($selectedPermissions);
-
-        $this->notify('success', 'Rol muvaffaqiyatli saqlandi');
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
     }
 
-    public function deleteRole()
+    public function createRole(): void
     {
-        if (!$this->selectedRole) return;
+        $this->validate([
+            'roleName' => 'required|string|max:255|unique:roles,name',
+        ], [
+            'roleName.required' => 'Rol nomi majburiy.',
+            'roleName.unique' => 'Bu rol nomi allaqachon mavjud.',
+        ]);
 
-        Role::destroy($this->selectedRole);
-        $this->selectedRole = null;
-        $this->roleName = null;
-        $this->roleDescription = null;
+        try {
+            $role = new Role();
+            $role->name = $this->roleName;
+            $role->slug = Str::slug($this->roleName);
+            $role->save();
 
-        $this->notify('success', 'Rol muvaffaqiyatli o\'chirildi');
+            $this->reset(['roleName']);
+            Notification::make()->success()->title('Rol muvaffaqiyatli yaratildi')->send();
+        } catch (\Exception $e) {
+            Notification::make()->danger()->title('Xatolik')->body('Rolni yaratishda xatolik: ' . $e->getMessage())->send();
+        }
+    }
+
+    public function assignPermissions($roleId): void
+    {
+        $this->redirect(route('filament.admin.pages.assign-permissions', ['role_id' => $roleId]));
+    }
+
+    public function openModal($type, $roleId): void
+    {
+        $this->modalType = $type;
+        $this->selectedRoleId = $roleId;
+        $role = Role::with('permissions')->findOrFail($roleId);
+
+        if ($type === 'edit') {
+            $this->editName = $role->name;
+            $this->selectedPermissions = [];
+            foreach ($this->permissions as $group) {
+                foreach ($group as $permission) {
+                    $this->selectedPermissions[$permission['id']] = $role->permissions->contains($permission['id']);
+                }
+            }
+        } else {
+            $this->roleToDeleteName = $role->name;
+        }
+
+        $this->showModal = true;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->reset(['modalType', 'selectedRoleId', 'editName', 'selectedPermissions', 'roleToDeleteName']);
+    }
+
+    public function updateRole(): void
+    {
+        $this->validate([
+            'editName' => 'required|string|max:255|unique:roles,name,' . $this->selectedRoleId,
+            'selectedPermissions.*' => 'nullable|boolean',
+        ], [
+            'editName.required' => 'Rol nomi majburiy.',
+            'editName.unique' => 'Bu rol nomi allaqachon mavjud.',
+        ]);
+
+        try {
+            $role = Role::findOrFail($this->selectedRoleId);
+            $role->name = $this->editName;
+            $role->slug = Str::slug($this->editName);
+            $role->save();
+
+            $selectedPermissionIds = collect($this->selectedPermissions)
+                ->filter(fn ($value) => $value)
+                ->keys()
+                ->toArray();
+            $role->permissions()->sync($selectedPermissionIds);
+
+            $this->closeModal();
+            Notification::make()->success()->title('Rol muvaffaqiyatli yangilandi')->send();
+        } catch (\Exception $e) {
+            Notification::make()->danger()->title('Xatolik')->body('Rolni yangilashda xatolik: ' . $e->getMessage())->send();
+        }
+    }
+
+    public function deleteRole(): void
+    {
+        try {
+            $role = Role::findOrFail($this->selectedRoleId);
+            $role->delete();
+
+            $this->closeModal();
+            Notification::make()->success()->title('Rol muvaffaqiyatli o\'chirildi')->send();
+        } catch (\Exception $e) {
+            Notification::make()->danger()->title('Xatolik')->body('Rolni o\'chirishda xatolik: ' . $e->getMessage())->send();
+        }
     }
 }
