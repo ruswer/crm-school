@@ -12,7 +12,6 @@ CRM-School bu Laravel asosida ishlab chiqilgan veb-ilova bo‘lib, o‘quv marka
 - 🧑‍🏫 Kurslar va guruhlarni boshqarish
 - 💰 To‘lovlar ro‘yxati, tahriri va holatini nazorat qilish
 - 📅 Dars jadvali yoki guruh tuzilmasi
-- 📊 Dashboard orqali umumiy statistikani ko‘rish
 - 🖥️ Laravel + Livewire + Tailwind asosidagi zamonaviy UI
 
 ---
