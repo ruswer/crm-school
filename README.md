@@ -23,8 +23,6 @@ CRM-School bu Laravel asosida ishlab chiqilgan veb-ilova bo‘lib, o‘quv marka
 - **Tailwind CSS** – Responsiv va minimal dizayn
 - **Alpine.js** – Yengil JS interaktivlik
 - **MySQL** – Ma’lumotlar bazasi
-- **Vite** – Frontend build sistemi
-
 ---
 
 ## ⚙️ O‘rnatish bo‘yicha yo‘riqnoma
