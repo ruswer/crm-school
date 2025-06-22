@@ -1,10 +1,10 @@
-# 🎓 CRM-School – O‘quv markazlari uchun CRM tizimi
+#  CRM-School – O‘quv markazlari uchun CRM tizimi
 
 CRM-School bu Laravel asosida ishlab chiqilgan veb-ilova bo‘lib, o‘quv markazlarining kundalik jarayonlarini boshqarish, optimallashtirish va avtomatlashtirishga mo‘ljallangan. Tizim orqali o‘quvchilar, o‘qituvchilar, guruhlar, kurslar va to‘lovlar boshqariladi.
 
 ---
 
-## 🚀 Asosiy imkoniyatlar
+##  Asosiy imkoniyatlar
 
 - 🔐 Avtorizatsiya va autentifikatsiya (Admin/Hodim)
 - 👨‍🎓 O‘quvchilarni qo‘shish, tahrirlash, ro‘yxatini ko‘rish
