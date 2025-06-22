@@ -1,10 +1,10 @@
-# 🎓 CRM-School – O‘quv markazlari uchun CRM tizimi
+#  CRM-School – O‘quv markazlari uchun CRM tizimi
 
 CRM-School bu Laravel asosida ishlab chiqilgan veb-ilova bo‘lib, o‘quv markazlarining kundalik jarayonlarini boshqarish, optimallashtirish va avtomatlashtirishga mo‘ljallangan. Tizim orqali o‘quvchilar, o‘qituvchilar, guruhlar, kurslar va to‘lovlar boshqariladi.
 
 ---
 
-## 🚀 Asosiy imkoniyatlar
+##  Asosiy imkoniyatlar
 
 - 🔐 Avtorizatsiya va autentifikatsiya (Admin/Hodim)
 - 👨‍🎓 O‘quvchilarni qo‘shish, tahrirlash, ro‘yxatini ko‘rish
@@ -12,7 +12,6 @@ CRM-School bu Laravel asosida ishlab chiqilgan veb-ilova bo‘lib, o‘quv marka
 - 🧑‍🏫 Kurslar va guruhlarni boshqarish
 - 💰 To‘lovlar ro‘yxati, tahriri va holatini nazorat qilish
 - 📅 Dars jadvali yoki guruh tuzilmasi
-- 📊 Dashboard orqali umumiy statistikani ko‘rish
 - 🖥️ Laravel + Livewire + Tailwind asosidagi zamonaviy UI
 
 ---
@@ -24,8 +23,6 @@ CRM-School bu Laravel asosida ishlab chiqilgan veb-ilova bo‘lib, o‘quv marka
 - **Tailwind CSS** – Responsiv va minimal dizayn
 - **Alpine.js** – Yengil JS interaktivlik
 - **MySQL** – Ma’lumotlar bazasi
-- **Vite** – Frontend build sistemi
-
 ---
 
 ## ⚙️ O‘rnatish bo‘yicha yo‘riqnoma
@@ -78,13 +75,6 @@ php artisan serve
 
 ---
 
-## 👤 Admin login (default)
-
-```text
-Email: admin@example.com
-Password: password
-```
-
 (Seeder orqali avtomatik yaratilgan — kerak bo‘lsa `DatabaseSeeder.php` faylini ko‘rib sozlang)
 
 ---
@@ -97,20 +87,9 @@ Password: password
 
 ---
 
-## 📄 Litsenziya
-
-Ushbu loyiha MIT litsenziyasi asosida tarqatiladi. Tafsilotlar uchun `LICENSE` faylini ko‘ring.
-
----
-
 ## 👨‍💻 Muallif
 
 **Doniyor Rustamov**  
 📧 doniyor.ruswer@gmail.com  
 🔗 GitHub: [@ruswer](https://github.com/ruswer)
 
----
-
-## 🙌 Qo‘shilish
-
-Agar siz ushbu loyihani rivojlantirishda ishtirok etmoqchi bo‘lsangiz, pull request oching yoki issue yarating.
